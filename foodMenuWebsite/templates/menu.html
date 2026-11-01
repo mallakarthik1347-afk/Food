@@ -1,273 +1,184 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-
-<h1 class="text-center mb-4">Our Menu</h1>
-
-<!-- Search Bar -->
-<div class="text-center mb-4">
-    <input id="searchBar"
-           type="text"
-           class="form-control mx-auto"
-           placeholder="🔍 Search for a dish...">
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h1 class="font-weight-bold mb-1">Our Culinary Menu</h1>
+        <p class="text-muted mb-0">Browse through 150+ authentic dishes across global and Indian regional cuisines.</p>
+    </div>
+    <div class="col-md-4 text-md-right mt-3 mt-md-0">
+        <span class="badge badge-pill badge-light px-3 py-2 text-muted border">
+            Found <strong>{{ total_count }}</strong> delicious dishes
+        </span>
+    </div>
 </div>
 
-<!-- Category Filters -->
-<div class="text-center mb-4">
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="all">All</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="pizza">Pizza</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="burger">Burgers</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="pasta">Pasta</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="drink">Drinks</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="salad">Salads</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="fries">Fries</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="dessert">Desserts</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="biryani">Biryani</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="thali">Thali</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="sweets">Sweets</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="snacks">Snacks</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="punjabi">Punjabi</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="andhra">Andhra</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="tamilnadu">Tamil Nadu</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="kerala">Kerala</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="maharashtrian">Maharashtrian</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="rajasthani">Rajasthani</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="chinese">Chinese</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="thai">Thai</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="latinamerican">Latin American</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="african">African</button>
-    <button class="btn btn-outline-primary filter-btn mx-1 mb-2" data-category="european">European</button>
-</div>
-
-<!-- Menu Grid -->
-<div class="row" id="menuContainer">
-
-    {% for item in items %}
-    <div class="col-md-6 col-lg-4 mb-4 menu-item" data-category="{{ item.category }}">
-        <div class="card menu-card">
-
-            {% set image_url = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" %}
-            {% if item.name == 'Margherita Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Pepperoni Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'BBQ Chicken Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Veggie Delight Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Veggie Burger' %}{% set image_url = "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Cheese Burst Burger' %}{% set image_url = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Crispy Chicken Burger' %}{% set image_url = url_for('static', filename='profile_pics/crispy_chicken_burger.jpg') %}
-            {% elif item.name == 'Smoky BBQ Burger' %}{% set image_url = url_for('static', filename='profile_pics/smoky_bbq_burger.jpg') %}
-            {% elif item.name == 'Pasta Alfredo' %}{% set image_url = "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Red Sauce Pasta' %}{% set image_url = url_for('static', filename='profile_pics/red_sauce_pasta.avif') %}
-            {% elif item.name == 'Pesto Pasta' %}{% set image_url = "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Four Cheese Pasta' %}{% set image_url = "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Cold Coffee' %}{% set image_url = "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Lemon Iced Tea' %}{% set image_url = "https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Strawberry Milkshake' %}{% set image_url = "https://images.unsplash.com/photo-1579954115545-a95591f28bfc?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Mojito' %}{% set image_url = "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Caesar Salad' %}{% set image_url = "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Greek Salad' %}{% set image_url = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Garden Fresh Salad' %}{% set image_url = "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Protein Salad' %}{% set image_url = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'French Fries' %}{% set image_url = url_for('static', filename='profile_pics/french_fries.jpg') %}
-            {% elif item.name == 'Peri Peri Fries' %}{% set image_url = "https://images.unsplash.com/photo-1590301157890-4810ed352733?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Garlic Bread' %}{% set image_url = url_for('static', filename='profile_pics/garlic_bread.jpg') %}
-            {% elif item.name == 'Chocolate Cake' %}{% set image_url = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Brownie with Ice Cream' %}{% set image_url = "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Donuts' %}{% set image_url = "https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.name == 'Fruit Bowl' %}{% set image_url = url_for('static', filename='profile_pics/fruit_bowl.jpg') %}
-            {% elif item.name == 'Hyderabadi Chicken Biryani' %}{% set image_url = "https://images.pexels.com/photos/5410401/pexels-photo-5410401.jpeg?cs=srgb&dl=pexels-saveurs-secretes-5410401.jpg&fm=jpg" %}
-            {% elif item.name == 'Hyderabadi Mutton Biryani' %}{% set image_url = url_for('static', filename='profile_pics/special_biryani.jpg') %}
-            {% elif item.name == 'Lucknowi Dum Biryani' %}{% set image_url = url_for('static', filename='profile_pics/lucknowi_dum_biryani.jpg') %}
-            {% elif item.name == 'Kolkata Biryani' %}{% set image_url = url_for('static', filename='profile_pics/kolkata_biryani.jpg') %}
-            {% elif item.name == 'Paneer Biryani' %}{% set image_url = url_for('static', filename='profile_pics/paneer_biryani.jpg') %}
-            {% elif item.name == 'Veg Dum Biryani' %}{% set image_url = url_for('static', filename='profile_pics/Vegetable-Dum-Biryani.jpg') %}
-            {% elif item.name == 'Egg Biryani' %}{% set image_url = url_for('static', filename='profile_pics/Egg-Biryani.jpg') %}
-            {% elif item.name == 'North Indian Royal Thali' %}{% set image_url = url_for('static', filename='profile_pics/north_thali.webp') %}
-            {% elif item.name == 'South Indian Traditional Thali' %}{% set image_url = url_for('static', filename='profile_pics/south_thali.avif') %}
-            {% elif item.name == 'Gujarati Thali' %}{% set image_url = url_for('static', filename='profile_pics/gujarati_th.jpg') %}
-            {% elif item.name == 'Rajasthani Thali' %}{% set image_url = url_for('static', filename='profile_pics/rajasthani_th.jpg') %}
-            {% elif item.name == 'Maharashtrian Thali' %}{% set image_url = url_for('static', filename='profile_pics/marathi_th.jpg') %}
-            {% elif item.name == 'Punjabi Special Thali' %}{% set image_url = url_for('static', filename='profile_pics/punjabi-th.webp') %}
-            {% elif item.name == 'Gulab Jamun' %}{% set image_url = url_for('static', filename='profile_pics/gulab_jamun.webp') %}
-            {% elif item.name == 'Rasgulla' %}{% set image_url = url_for('static', filename='profile_pics/rasgulla.jpg') %}
-            {% elif item.name == 'Kaju Katli' %}{% set image_url = url_for('static', filename='profile_pics/kaju_burfi.webp') %}
-            {% elif item.name == 'Jalebi' %}{% set image_url = url_for('static', filename='profile_pics/jalebi.webp') %}
-            {% elif item.name == 'Rasmalai' %}{% set image_url = url_for('static', filename='profile_pics/rasamalai.webp') %}
-            {% elif item.name == 'Motichoor Laddu' %}{% set image_url = url_for('static', filename='profile_pics/MotichoorLaddu.webp') %}
-            {% elif item.name == 'Mysore Pak' %}{% set image_url = url_for('static', filename='profile_pics/MysorePak.webp') %}
-            {% elif item.name == 'Samosa' %}{% set image_url = url_for('static', filename='profile_pics/samosa.jpg') %}
-            {% elif item.name == 'Aloo Tikki Chaat' %}{% set image_url = url_for('static', filename='profile_pics/Chat.jpg') %}
-            {% elif item.name == 'Pani Puri' %}{% set image_url = url_for('static', filename='profile_pics/Pani-Puri.webp') %}
-            {% elif item.name == 'Dahi Puri' %}{% set image_url = url_for('static', filename='profile_pics/dahi-puri.jpg') %}
-            {% elif item.name == 'Pav Bhaji' %}{% set image_url = url_for('static', filename='profile_pics/pav_bhaji.webp') %}
-            {% elif item.name == 'Vada Pav' %}{% set image_url = url_for('static', filename='profile_pics/Vada-Pav.webp') %}
-            {% elif item.name == 'Masala Corn' %}{% set image_url = url_for('static', filename='profile_pics/MasalaCorn.jpg') %}
-            {% elif item.name == 'Bread Pakora' %}{% set image_url = url_for('static', filename='profile_pics/bread-pakoda.jpg') %}
-            {% elif item.name == 'Butter Chicken' %}{% set image_url = url_for('static', filename='profile_pics/butter-chicken.jpg') %}
-            {% elif item.name == 'Amritsari Kulcha' %}{% set image_url = url_for('static', filename='profile_pics/amritsari-kulcha.avif') %}
-            {% elif item.name == 'Sarson da Saag with Makki di Roti' %}{% set image_url = url_for('static', filename='profile_pics/sarson_ka_saag.webp') %}
-            {% elif item.name == 'Paneer Butter Masala' %}{% set image_url = url_for('static', filename='profile_pics/paneer-butter-masala.jpg') %}
-            {% elif item.name == 'Dal Makhani' %}{% set image_url = url_for('static', filename='profile_pics/dal-makhani.webp') %}
-            {% elif item.name == 'Chole Bhature' %}{% set image_url = url_for('static', filename='profile_pics/chole-bhature.png') %}
-            {% elif item.name == 'Tandoori Chicken' %}{% set image_url = url_for('static', filename='profile_pics/tandoori.jpg') %}
-            {% elif item.name == 'Paneer Tikka' %}{% set image_url = url_for('static', filename='profile_pics/paneer-tikka.jpg') %}
-            {% elif item.name == 'Chicken Tikka' %}{% set image_url = url_for('static', filename='profile_pics/chicken-tikka.jpg') %}
-            {% elif item.name == 'Sweet Lassi' %}{% set image_url = url_for('static', filename='profile_pics/lassi.webp') %}
-            {% elif item.name == 'Andhra Chicken Curry' %}{% set image_url = url_for('static', filename='profile_pics/Andhra-Chicken-Curry.jpg') %}
-            {% elif item.name == 'Gongura Mutton' %}{% set image_url = url_for('static', filename='profile_pics/gongura-mutton.jpg') %}
-            {% elif item.name == 'Andhra Fish Fry' %}{% set image_url = url_for('static', filename='profile_pics/andhra-fish-curry.jpg') %}
-            {% elif item.name == 'Kodi Vepudu' %}{% set image_url = url_for('static', filename='profile_pics/kodi-vepudu.jpg') %}
-            {% elif item.name == 'Andhra Prawn Curry' %}{% set image_url = url_for('static', filename='profile_pics/andhra-prawn-curry.jpg') %}
-            {% elif item.name == 'Royyala Iguru' %}{% set image_url = url_for('static', filename='profile_pics/royyala-iguru.webp') %}
-            {% elif item.name == 'Andhra Spicy Biryani' %}{% set image_url = url_for('static', filename='profile_pics/andhra-spicy-biryani.jpg') %}
-            {% elif item.name == 'Tomato Pappu' %}{% set image_url = url_for('static', filename='profile_pics/tomato-pappu.jpg') %}
-            {% elif item.name == 'Andhra Rasam' %}{% set image_url = url_for('static', filename='profile_pics/rasam.jpg') %}
-            {% elif item.name == 'Gutti Vankaya Curry' %}{% set image_url = url_for('static', filename='profile_pics/vankaya-curry.jpg') %}
-            {% elif item.name == 'Chettinad Chicken' %}{% set image_url = url_for('static', filename='profile_pics/Chicken-Chettinad.jpg') %}
-            {% elif item.name == 'Chicken Chettinad Biryani' %}{% set image_url = url_for('static', filename='profile_pics/chettinad-biryani.webp') %}
-            {% elif item.name == 'Karaikudi Mutton Curry' %}{% set image_url = url_for('static', filename='profile_pics/Tamil-style-mutton-biryani.webp') %}
-            {% elif item.name == 'Idli with Sambar' %}{% set image_url = url_for('static', filename='profile_pics/idli_sambar.jpg') %}
-            {% elif item.name == 'Dosa with Chutney' %}{% set image_url = url_for('static', filename='profile_pics/dosa.jpg') %}
-            {% elif item.name == 'Pongal' %}{% set image_url = url_for('static', filename='profile_pics/pongal.jpg') %}
-            {% elif item.name == 'Lemon Rice' %}{% set image_url = url_for('static', filename='profile_pics/lemon-rice.gif') %}
-            {% elif item.name == 'Tamarind Rice' %}{% set image_url = url_for('static', filename='profile_pics/tamarindrice.webp') %}
-            {% elif item.name == 'Medu Vada' %}{% set image_url = url_for('static', filename='profile_pics/medu-vada.webp') %}
-            {% elif item.name == 'Filter Coffee' %}{% set image_url = url_for('static', filename='profile_pics/coffee.webp') %}
-            {% elif item.name == 'Kerala Fish Curry' %}{% set image_url = url_for('static', filename='profile_pics/Kerala-Fish-Curry.jpg') %}
-            {% elif item.name == 'Malabar Chicken Biryani' %}{% set image_url = url_for('static', filename='profile_pics/malabar-chicken-biryani.jpg') %}
-            {% elif item.name == 'Appam with Vegetable Stew' %}{% set image_url = url_for('static', filename='profile_pics/appam.jpg') %}
-            {% elif item.name == 'Kerala Prawn Curry' %}{% set image_url = url_for('static', filename='profile_pics/Kerala-Prawn-Curry.jpg') %}
-            {% elif item.name == 'Kerala Beef Fry' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Beef%20Fry,food/all" %}
-            {% elif item.name == 'Kerala Parotta with Curry' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Parotta%20with%20Curry,food/all" %}
-            {% elif item.name == 'Avial' %}{% set image_url = "https://loremflickr.com/800/600/Avial,food/all" %}
-            {% elif item.name == 'Kerala Sadya' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Sadya,food/all" %}
-            {% elif item.name == 'Banana Chips' %}{% set image_url = "https://loremflickr.com/800/600/Banana%20Chips,food/all" %}
-            {% elif item.name == 'Payasam' %}{% set image_url = "https://loremflickr.com/800/600/Payasam,food/all" %}
-            {% elif item.name == 'Misal Pav' %}{% set image_url = "https://loremflickr.com/800/600/Misal%20Pav,food/all" %}
-            {% elif item.name == 'Puran Poli' %}{% set image_url = "https://loremflickr.com/800/600/Puran%20Poli,food/all" %}
-            {% elif item.name == 'Sabudana Khichdi' %}{% set image_url = "https://loremflickr.com/800/600/Sabudana%20Khichdi,food/all" %}
-            {% elif item.name == 'Kanda Bhaji' %}{% set image_url = "https://loremflickr.com/800/600/Kanda%20Bhaji,food/all" %}
-            {% elif item.name == 'Thalipeeth' %}{% set image_url = "https://loremflickr.com/800/600/Thalipeeth,food/all" %}
-            {% elif item.name == 'Kolhapuri Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Kolhapuri%20Chicken,food/all" %}
-            {% elif item.name == 'Kolhapuri Mutton' %}{% set image_url = "https://loremflickr.com/800/600/Kolhapuri%20Mutton,food/all" %}
-            {% elif item.name == 'Modak' %}{% set image_url = "https://loremflickr.com/800/600/Modak,food/all" %}
-            {% elif item.name == 'Dal Baati Churma' %}{% set image_url = "https://loremflickr.com/800/600/Dal%20Baati%20Churma,food/all" %}
-            {% elif item.name == 'Gatte ki Sabzi' %}{% set image_url = "https://loremflickr.com/800/600/Gatte%20ki%20Sabzi,food/all" %}
-            {% elif item.name == 'Laal Maas' %}{% set image_url = "https://loremflickr.com/800/600/Laal%20Maas,food/all" %}
-            {% elif item.name == 'Ker Sangri' %}{% set image_url = "https://loremflickr.com/800/600/Ker%20Sangri,food/all" %}
-            {% elif item.name == 'Rajasthani Kadhi' %}{% set image_url = "https://loremflickr.com/800/600/Rajasthani%20Kadhi,food/all" %}
-            {% elif item.name == 'Bajra Roti with Garlic Chutney' %}{% set image_url = "https://loremflickr.com/800/600/Bajra%20Roti%20with%20Garlic%20Chutney,food/all" %}
-            {% elif item.name == 'Mawa Kachori' %}{% set image_url = "https://loremflickr.com/800/600/Mawa%20Kachori,food/all" %}
-            {% elif item.name == 'Mirchi Vada' %}{% set image_url = "https://loremflickr.com/800/600/Mirchi%20Vada,food/all" %}
-            {% elif item.name == 'Ghewar' %}{% set image_url = "https://loremflickr.com/800/600/Ghewar,food/all" %}
-            {% elif item.name == 'Veg Hakka Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Hakka%20Noodles,food/all" %}
-            {% elif item.name == 'Chicken Hakka Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Hakka%20Noodles,food/all" %}
-            {% elif item.name == 'Schezwan Fried Rice' %}{% set image_url = "https://loremflickr.com/800/600/Schezwan%20Fried%20Rice,food/all" %}
-            {% elif item.name == 'Chicken Manchurian' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Manchurian,food/all" %}
-            {% elif item.name == 'Veg Manchurian' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Manchurian,food/all" %}
-            {% elif item.name == 'Spring Rolls' %}{% set image_url = "https://loremflickr.com/800/600/Spring%20Rolls,food/all" %}
-            {% elif item.name == 'Hot and Sour Soup' %}{% set image_url = "https://loremflickr.com/800/600/Hot%20and%20Sour%20Soup,food/all" %}
-            {% elif item.name == 'Chili Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Chili%20Chicken,food/all" %}
-            {% elif item.name == 'Garlic Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Garlic%20Noodles,food/all" %}
-            {% elif item.name == 'Pad Thai Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Pad%20Thai%20Noodles,food/all" %}
-            {% elif item.name == 'Thai Green Curry' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Green%20Curry,food/all" %}
-            {% elif item.name == 'Thai Red Curry' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Red%20Curry,food/all" %}
-            {% elif item.name == 'Thai Basil Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Basil%20Chicken,food/all" %}
-            {% elif item.name == 'Mango Sticky Rice' %}{% set image_url = "https://loremflickr.com/800/600/Mango%20Sticky%20Rice,food/all" %}
-            {% elif item.name == 'Thai Fried Rice' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Fried%20Rice,food/all" %}
-            {% elif item.name == 'Tom Yum Soup' %}{% set image_url = "https://loremflickr.com/800/600/Tom%20Yum%20Soup,food/all" %}
-            {% elif item.name == 'Pineapple Fried Rice' %}{% set image_url = "https://loremflickr.com/800/600/Pineapple%20Fried%20Rice,food/all" %}
-            {% elif item.name == 'Mexican Burrito Bowl' %}{% set image_url = "https://loremflickr.com/800/600/Mexican%20Burrito%20Bowl,food/all" %}
-            {% elif item.name == 'Chicken Quesadilla' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Quesadilla,food/all" %}
-            {% elif item.name == 'Beef Tacos' %}{% set image_url = "https://loremflickr.com/800/600/Beef%20Tacos,food/all" %}
-            {% elif item.name == 'Veg Enchiladas' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Enchiladas,food/all" %}
-            {% elif item.name == 'Nachos Supreme' %}{% set image_url = "https://loremflickr.com/800/600/Nachos%20Supreme,food/all" %}
-            {% elif item.name == 'Mexican Street Corn' %}{% set image_url = "https://loremflickr.com/800/600/Mexican%20Street%20Corn,food/all" %}
-            {% elif item.name == 'Chimichanga' %}{% set image_url = "https://loremflickr.com/800/600/Chimichanga,food/all" %}
-            {% elif item.name == 'Jollof Rice' %}{% set image_url = "https://loremflickr.com/800/600/Jollof%20Rice,food/all" %}
-            {% elif item.name == 'Chicken Yassa' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Yassa,food/all" %}
-            {% elif item.name == 'Bunny Chow' %}{% set image_url = "https://loremflickr.com/800/600/Bunny%20Chow,food/all" %}
-            {% elif item.name == 'Moroccan Chicken Tagine' %}{% set image_url = "https://loremflickr.com/800/600/Moroccan%20Chicken%20Tagine,food/all" %}
-            {% elif item.name == 'Couscous Royal' %}{% set image_url = "https://loremflickr.com/800/600/Couscous%20Royal,food/all" %}
-            {% elif item.name == 'Peri Peri Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Peri%20Peri%20Chicken,food/all" %}
-            {% elif item.name == 'Ethiopian Doro Wat' %}{% set image_url = "https://loremflickr.com/800/600/Ethiopian%20Doro%20Wat,food/all" %}
-            {% elif item.name == 'Spaghetti Carbonara' %}{% set image_url = "https://loremflickr.com/800/600/Spaghetti%20Carbonara,food/all" %}
-            {% elif item.name == 'Mushroom Risotto' %}{% set image_url = "https://loremflickr.com/800/600/Mushroom%20Risotto,food/all" %}
-            {% elif item.name == 'Chicken Alfredo Pasta' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Alfredo%20Pasta,food/all" %}
-            {% elif item.name == 'Fish and Chips' %}{% set image_url = "https://loremflickr.com/800/600/Fish%20and%20Chips,food/all" %}
-            {% elif item.name == 'Grilled Lamb Steak' %}{% set image_url = "https://loremflickr.com/800/600/Grilled%20Lamb%20Steak,food/all" %}
-            {% elif item.name == 'Lasagna' %}{% set image_url = "https://loremflickr.com/800/600/Lasagna,food/all" %}
-            {% elif item.name == 'Bruschetta' %}{% set image_url = "https://loremflickr.com/800/600/Bruschetta,food/all" %}
-            {% elif item.name == 'French Onion Soup' %}{% set image_url = "https://loremflickr.com/800/600/French%20Onion%20Soup,food/all" %}
-            {% endif %}
-
-            <img src="{{ image_url }}" alt="{{ item.name }}" loading="lazy">
-
-            <div class="card-body">
-                <h4 class="card-title">{{ item.name }}</h4>
-                <p class="card-text">{{ item.description }}</p>
+<!-- SMART FOOD FILTERS PANEL -->
+<div class="filter-card mb-4 shadow-sm">
+    <form method="GET" action="{{ url_for('menu') }}" id="filterForm">
+        <div class="row">
+            <!-- Search Input -->
+            <div class="col-lg-4 col-md-6 mb-3">
+                <label class="font-weight-bold small text-muted"><i class="fas fa-search mr-1"></i> Search Dish or Cuisine</label>
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search biryani, pizza, paneer..." value="{{ search_query }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
             </div>
 
-            <div class="card-footer">
-                <span class="menu-price">${{ item.price }}</span>
+            <!-- Veg / Non-Veg Toggle Filter -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="font-weight-bold small text-muted"><i class="fas fa-leaf mr-1"></i> Dietary Preference</label>
+                <select name="veg" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                    <option value="" {% if veg_filter == '' %}selected{% endif %}>All Diets (Veg & Non-Veg)</option>
+                    <option value="1" {% if veg_filter == '1' %}selected{% endif %}>🟢 Pure Vegetarian Only</option>
+                    <option value="0" {% if veg_filter == '0' %}selected{% endif %}>🔴 Non-Vegetarian Only</option>
+                </select>
+            </div>
 
-                {% if current_user.is_authenticated %}
-               <form action="{{ url_for('add_to_cart', menu_item_id=item.id) }}" method="POST" class="m-0">
-                  <button type="submit" class="btn btn-primary btn-add-cart">
-                      Add <span>+</span>
-                  </button>
-               </form>
+            <!-- Price Range Filter -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="font-weight-bold small text-muted"><i class="fas fa-dollar-sign mr-1"></i> Price Range</label>
+                <div class="d-flex align-items-center">
+                    <input type="number" step="0.5" name="min_price" class="form-control mr-1" placeholder="Min $" value="{{ min_price if min_price is not none else '' }}">
+                    <span class="text-muted px-1">-</span>
+                    <input type="number" step="0.5" name="max_price" class="form-control ml-1" placeholder="Max $" value="{{ max_price if max_price is not none else '' }}">
+                </div>
+            </div>
 
-                {% else %}
-                <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-add-cart">Log in to order</a>
+            <!-- Sorting Options -->
+            <div class="col-lg-2 col-md-6 mb-3">
+                <label class="font-weight-bold small text-muted"><i class="fas fa-arrow-down-wide-short mr-1"></i> Sort By</label>
+                <select name="sort" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                    <option value="default" {% if sort_by == 'default' %}selected{% endif %}>Recommended</option>
+                    <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="rating_desc" {% if sort_by == 'rating_desc' %}selected{% endif %}>Highest Rated</option>
+                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Alphabetical (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="mt-2 pt-2 border-top">
+            <div class="d-flex flex-wrap align-items-center">
+                <span class="font-weight-bold small text-muted mr-2 my-1">Category:</span>
+                <a href="{{ url_for('menu', q=search_query, veg=veg_filter, spicy=spicy_filter, min_price=min_price, max_price=max_price, sort=sort_by) }}"
+                   class="category-pill {% if not selected_category or selected_category == 'all' %}active{% endif %}">
+                    All
+                </a>
+                {% for cat in categories %}
+                <a href="{{ url_for('menu', category=cat, q=search_query, veg=veg_filter, spicy=spicy_filter, min_price=min_price, max_price=max_price, sort=sort_by) }}"
+                   class="category-pill {% if selected_category == cat %}active{% endif %}">
+                    {{ cat|capitalize }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Filter Actions: Apply & Reset -->
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+            <div class="d-flex align-items-center">
+                <div class="custom-control custom-checkbox mr-3">
+                    <input type="checkbox" class="custom-control-input" id="spicyCheck" name="spicy" value="1" {% if spicy_filter == '1' %}checked{% endif %} onchange="document.getElementById('filterForm').submit()">
+                    <label class="custom-control-label font-weight-bold small text-danger" for="spicyCheck">
+                        <i class="fas fa-pepper-hot mr-1"></i> Spicy Dishes Only
+                    </label>
+                </div>
+            </div>
+            <div>
+                <a href="{{ url_for('menu') }}" class="btn btn-outline-secondary btn-sm mr-2">
+                    <i class="fas fa-rotate-left mr-1"></i> Reset Filters
+                </a>
+                <button type="submit" class="btn btn-primary btn-sm px-3">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- MENU ITEMS GRID -->
+{% if items %}
+<div class="row" id="menuContainer">
+    {% for item in items %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card menu-card h-100">
+            <div class="position-relative">
+                <a href="{{ url_for('food_detail', item_id=item.id) }}">
+                    <img src="{{ item.image_url or url_for('static', filename='profile_pics/special_biryani.jpg') }}" alt="{{ item.name }}" loading="lazy">
+                </a>
+                <div class="position-absolute" style="top: 10px; right: 10px;">
+                    <span class="badge badge-light px-2 py-1 shadow-sm font-weight-bold">
+                        <i class="fas fa-star text-warning mr-1"></i> {{ item.rating }}
+                    </span>
+                </div>
+                {% if item.is_spicy %}
+                <div class="position-absolute" style="bottom: 10px; left: 10px;">
+                    <span class="badge badge-danger px-2 py-1 shadow-sm font-weight-bold">
+                        <i class="fas fa-pepper-hot mr-1"></i> Spicy
+                    </span>
+                </div>
                 {% endif %}
+            </div>
+
+            <div class="card-body p-3 d-flex flex-column">
+                <div class="d-flex align-items-center mb-1">
+                    {% if item.is_veg %}
+                        <span class="badge-veg-dot" title="Pure Vegetarian"></span>
+                    {% else %}
+                        <span class="badge-nonveg-dot" title="Non-Vegetarian"></span>
+                    {% endif %}
+                    <span class="badge badge-light text-muted small font-weight-bold">{{ item.category|capitalize }}</span>
+                    {% if item.restaurant %}
+                        <a href="{{ url_for('restaurant_detail', restaurant_id=item.restaurant.id) }}" class="small text-muted ml-auto text-truncate" style="max-width: 140px;">
+                            <i class="fas fa-store mr-1 text-danger"></i> {{ item.restaurant.name }}
+                        </a>
+                    {% endif %}
+                </div>
+
+                <h5 class="card-title font-weight-bold mb-1">
+                    <a href="{{ url_for('food_detail', item_id=item.id) }}" class="text-dark">
+                        {{ item.name }}
+                    </a>
+                </h5>
+                <p class="card-text text-muted small mb-3 flex-grow-1">
+                    {{ item.description if item.description else "Freshly prepared with authentic culinary ingredients." }}
+                </p>
+
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                    <div>
+                        <span class="menu-price text-danger">${{ "%.2f"|format(item.price) }}</span>
+                    </div>
+
+                    {% if current_user.is_authenticated %}
+                    <form action="{{ url_for('add_to_cart', menu_item_id=item.id) }}" method="POST" class="m-0">
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">
+                            <i class="fas fa-plus mr-1"></i> Add
+                        </button>
+                    </form>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        Log in to order
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
-
 </div>
-
-<!-- JS Search + Filter -->
-<script>
-    const searchBar = document.getElementById('searchBar');
-    const menuItems = document.querySelectorAll('.menu-item');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedCategory = urlParams.get('category');
-
-    if (selectedCategory) {
-        menuItems.forEach(item => {
-            item.style.display = (item.getAttribute('data-category') === selectedCategory) ? "block" : "none";
-        });
-        window.scrollTo(0, document.querySelector('#menuContainer').offsetTop - 80);
-    }
-
-    searchBar.addEventListener('keyup', () => {
-        const searchValue = searchBar.value.toLowerCase();
-        menuItems.forEach(item => {
-            item.style.display =
-                item.textContent.toLowerCase().includes(searchValue)
-                    ? "block"
-                    : "none";
-        });
-    });
-
-    document.querySelectorAll('.filter-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const category = button.getAttribute('data-category');
-            menuItems.forEach(item => {
-                item.style.display =
-                    (category === "all" || item.getAttribute('data-category') === category)
-                        ? "block"
-                        : "none";
-            });
-            window.scrollTo({
-                top: document.querySelector('#menuContainer').offsetTop - 50,
-                behavior: "smooth"
-            });
-        });
-    });
-</script>
+{% else %}
+<div class="text-center py-5 bg-white rounded-lg shadow-sm">
+    <div class="text-muted mb-3" style="font-size: 3rem;"><i class="fas fa-utensils"></i></div>
+    <h3 class="font-weight-bold">No dishes found matching your filters</h3>
+    <p class="text-muted mb-4">Try adjusting your price range, dietary preference, or search terms.</p>
+    <a href="{{ url_for('menu') }}" class="btn btn-primary px-4 py-2 rounded-pill">
+        <i class="fas fa-rotate-left mr-1"></i> Reset All Filters
+    </a>
+</div>
+{% endif %}
 
 {% endblock %}

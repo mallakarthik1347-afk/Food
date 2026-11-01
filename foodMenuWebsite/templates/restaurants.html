@@ -1,0 +1,782 @@
+{% extends "base.html" %}
+{% block extra_css %}
+<style>
+    #nearby-map {
+        height: 500px;
+        width: 100%;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Map container positioning */
+    .map-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* My Location floating button on the map (bottom-right) */
+    .my-location-btn {
+        position: absolute;
+        bottom: 85px;
+        right: 12px;
+        z-index: 1000;
+        background: #ffffff;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        color: #1e293b;
+        font-size: 1.05rem;
+        transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
+        outline: none;
+    }
+    .my-location-btn:hover {
+        background: #f8fafc;
+        color: #0284c7;
+        transform: scale(1.05);
+    }
+    .my-location-btn.active {
+        color: #0284c7;
+        background: #e0f2fe;
+        border-color: #0284c7;
+    }
+    .my-location-btn.locating {
+        pointer-events: none;
+        color: #0284c7;
+    }
+
+    /* Layer switcher button (above My Location button) */
+    .layer-switch-btn {
+        position: absolute;
+        bottom: 130px;
+        right: 12px;
+        z-index: 1000;
+        background: #ffffff;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        color: #1e293b;
+        font-size: 0.95rem;
+        transition: background 0.2s, color 0.2s, transform 0.15s;
+        outline: none;
+    }
+    .layer-switch-btn:hover {
+        background: #f8fafc;
+        color: #e23744;
+        transform: scale(1.05);
+    }
+    .layer-switch-btn.satellite-active {
+        background: #0f172a;
+        color: #f8fafc;
+        border-color: #334155;
+    }
+
+    /* Pulsing user marker */
+    .user-gps-marker-pulse {
+        background: #0284c7;
+        color: #ffffff;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.3);
+        border: 3px solid #ffffff;
+        animation: gpsPulse 2s infinite;
+    }
+    @keyframes gpsPulse {
+        0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.5); }
+        70% { box-shadow: 0 0 0 14px rgba(2, 132, 199, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+    }
+
+    /* GPS button loading state */
+    #findNearMeBtn.loading {
+        pointer-events: none;
+        opacity: 0.75;
+    }
+
+    /* Responsive map */
+    @media (max-width: 768px) {
+        #nearby-map { height: 350px; }
+        .layer-switch-btn { bottom: 120px; }
+        .my-location-btn { bottom: 75px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-7">
+        <h1 class="font-weight-bold mb-1">Discover Nearby Restaurants</h1>
+        <p class="text-muted mb-0">Live GPS proximity detection with distance calculation and interactive map navigation.</p>
+    </div>
+    <div class="col-md-5 text-md-right mt-3 mt-md-0">
+        <button id="findNearMeBtn" class="btn btn-primary rounded-pill px-4 shadow-sm" onclick="locateUserAndFetchNearby(true)">
+            <i class="fas fa-location-crosshairs mr-2"></i> Find Restaurants Near Me
+        </button>
+    </div>
+</div>
+
+<!-- GPS CONTROLS & DISTANCE FILTER BAR -->
+<div class="filter-card mb-4 shadow-sm">
+    <div class="row align-items-center">
+        <div class="col-md-4 mb-3 mb-md-0">
+            <label class="font-weight-bold small text-muted mb-1"><i class="fas fa-compass mr-1"></i> Max Proximity Distance</label>
+            <select id="distanceFilter" class="form-control" onchange="applyDistanceFilter()">
+                <option value="all">All Distances</option>
+                <option value="2">Within 2 km (Walking / Ultra-Fast)</option>
+                <option value="5">Within 5 km (Standard Delivery)</option>
+                <option value="10" selected>Within 10 km (Extended City Area)</option>
+            </select>
+        </div>
+
+        <div class="col-md-5 mb-3 mb-md-0">
+            <label class="font-weight-bold small text-muted mb-1"><i class="fas fa-search mr-1"></i> Filter by Restaurant Name or Cuisine</label>
+            <input type="text" id="restaurantSearch" class="form-control" placeholder="Search biryani, burgers, south indian, chinese..." onkeyup="filterRestaurantsClientSide()">
+        </div>
+
+        <div class="col-md-3 text-md-right">
+            <span id="geoStatusText" class="badge badge-pill badge-light px-3 py-2 text-muted border small d-inline-block mt-3" style="max-width: 100%; white-space: normal; line-height: 1.4;">
+                <i class="fas fa-satellite-dish mr-1 text-primary"></i> Detecting location...
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- INTERACTIVE MAP (LEAFLET.JS) -->
+<div class="card border-0 shadow-sm rounded-lg mb-5 overflow-hidden">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+        <h5 class="mb-0 font-weight-bold text-dark">
+            <i class="fas fa-map-marked-alt text-danger mr-2"></i> Live Nearby Restaurant Map
+        </h5>
+        <div class="d-flex align-items-center">
+            <small id="layerLabel" class="text-muted mr-3">
+                <i class="fas fa-circle text-success mr-1" style="font-size: 8px;"></i> Street Map
+            </small>
+            <small class="text-muted d-none d-sm-inline">
+                <i class="fas fa-circle text-info mr-1" style="font-size: 8px;"></i> Leaflet &amp; OpenStreetMap
+            </small>
+        </div>
+    </div>
+    <div class="card-body p-0 map-wrapper">
+        <div id="nearby-map"></div>
+
+        <!-- Layer Switcher: Street ↔ Satellite (Above My Location) -->
+        <button class="layer-switch-btn" id="layerSwitchBtn"
+                onclick="toggleMapLayer()"
+                title="Switch between Standard Street Map and Satellite View">
+            <i class="fas fa-satellite-dish"></i>
+        </button>
+
+        <!-- My Location / Recenter Button (Bottom-Right) -->
+        <button class="my-location-btn" id="myLocationBtn"
+                onclick="recenterToMyLocation()"
+                title="My Location — Center map to your exact GPS coordinates">
+            <i class="fas fa-location-crosshairs"></i>
+        </button>
+    </div>
+</div>
+
+<!-- RESTAURANT CARDS GRID -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="font-weight-bold mb-0">Restaurant Directory</h3>
+    <span id="restaurantCountBadge" class="badge badge-pill badge-primary px-3 py-2">
+        {{ restaurants|length }} Available
+    </span>
+</div>
+
+<div class="row" id="restaurantCardsContainer">
+    {% for rest in restaurants %}
+    <div class="col-md-6 col-lg-4 mb-4 restaurant-card-item"
+         data-name="{{ rest.name|lower }}"
+         data-cuisine="{{ rest.cuisine_type|lower }}"
+         data-lat="{{ rest.latitude }}"
+         data-lng="{{ rest.longitude }}"
+         data-id="{{ rest.id }}"
+         style="cursor:pointer;"
+         onclick="focusRestaurantOnMap({{ rest.latitude }}, {{ rest.longitude }}, '{{ rest.name|replace("'","\\'")|e }}')">
+        <div class="card restaurant-card h-100">
+            <div class="position-relative">
+                <img src="{{ rest.image_url }}" alt="{{ rest.name }}" loading="lazy"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='profile_pics/default.webp') }}'">
+                <div class="position-absolute" style="top: 12px; right: 12px;">
+                    <span class="badge badge-success px-2 py-1 shadow-sm font-weight-bold">
+                        <i class="fas fa-star mr-1"></i> {{ rest.rating }}
+                    </span>
+                </div>
+                <div class="position-absolute distance-tag" style="bottom: 12px; left: 12px; display: none;">
+                    <span class="badge badge-dark px-2 py-1 shadow-sm font-weight-bold">
+                        <i class="fas fa-route text-warning mr-1"></i> <span class="dist-val">--</span> km away
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body p-3 d-flex flex-column">
+                <h5 class="card-title font-weight-bold mb-1">{{ rest.name }}</h5>
+                <p class="text-danger small font-weight-bold mb-2">
+                    <i class="fas fa-bowl-food mr-1"></i> {{ rest.cuisine_type }}
+                </p>
+                <p class="text-muted small mb-2 text-truncate">
+                    <i class="fas fa-location-dot text-muted mr-1"></i> {{ rest.address }}
+                </p>
+                <p class="text-muted small mb-3">
+                    <i class="fas fa-clock text-muted mr-1"></i> {{ rest.opening_hours }}
+                </p>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ rest.latitude }},{{ rest.longitude }}"
+                       target="_blank" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()">
+                        <i class="fas fa-diamond-turn-right mr-1"></i> Directions
+                    </a>
+                    <a href="{{ url_for('restaurant_detail', restaurant_id=rest.id) }}"
+                       class="btn btn-sm btn-primary px-3" onclick="event.stopPropagation()">
+                        View Menu &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ============================================================
+    // State variables
+    // ============================================================
+    let map = null;
+    let userMarker = null;
+    let userAccuracyCircle = null;
+    let markersLayer = null;
+    let userLatLng = null;        // Real GPS coordinates (null until acquired)
+    let isSatellite = false;      // Satellite layer state
+    let isLocating = false;       // Guard against concurrent location requests
+
+    // Tile layer references
+    let streetLayer = null;
+    let satelliteLayer = null;
+
+    // Neutral country-level fallback center (geographical center of India)
+    // Used ONLY before user grants GPS permission — NEVER claimed as user location
+    const NEUTRAL_FALLBACK_CENTER = [20.5937, 78.9629];
+    const NEUTRAL_FALLBACK_ZOOM = 5;
+
+    // ============================================================
+    // Initialise Map & Auto-Detect Location on Page Load
+    // ============================================================
+    document.addEventListener("DOMContentLoaded", function () {
+        initMap();
+        // Immediately attempt browser geolocation on load
+        requestUserLocation(false);
+    });
+
+    function initMap() {
+        // Initialize map with neutral overview (NOT hardcoded to Hyderabad or any city)
+        map = L.map('nearby-map', {
+            zoomControl: true,
+            scrollWheelZoom: true
+        }).setView(NEUTRAL_FALLBACK_CENTER, NEUTRAL_FALLBACK_ZOOM);
+
+        // Standard Street Map layer (OpenStreetMap)
+        streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        });
+
+        // Satellite layer (Esri World Imagery — legitimate, free, no API key needed)
+        satelliteLayer = L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics',
+            maxZoom: 19
+        });
+
+        // Start with Street layer
+        streetLayer.addTo(map);
+
+        // Group layer for restaurant pins
+        markersLayer = L.layerGroup().addTo(map);
+
+        // Plot initial restaurant pins from server-rendered DOM elements
+        plotRestaurantsOnMap();
+
+        // Fit map bounds to show all available partner restaurants if no GPS yet
+        if (markersLayer.getLayers().length > 0) {
+            try {
+                const bounds = L.latLngBounds(
+                    markersLayer.getLayers()
+                        .filter(l => l.getLatLng)
+                        .map(l => l.getLatLng())
+                );
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+                }
+            } catch (e) {
+                console.warn("Bounds fitting note:", e);
+            }
+        }
+    }
+
+    // ============================================================
+    // Resilient Geolocation API Helper
+    // ============================================================
+    /**
+     * Retrieves the user's actual current GPS location.
+     * Tries high-accuracy GPS first (ideal for mobile).
+     * If high-accuracy times out on PC/laptop without a dedicated GPS chip,
+     * it automatically falls back to network/Wi-Fi geolocation.
+     */
+    function getCurrentGPS(onSuccess, onError) {
+        if (!navigator.geolocation) {
+            onError({ code: -1, message: "Geolocation is not supported by your browser." });
+            return;
+        }
+
+        if (window.isSecureContext === false && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            onError({ code: -2, message: "Browser Geolocation requires a secure connection (HTTPS or localhost)." });
+            return;
+        }
+
+        // Attempt 1: High accuracy GPS with 6s timeout
+        navigator.geolocation.getCurrentPosition(
+            onSuccess,
+            function (err) {
+                // If timed out or position unavailable, fall back to low-accuracy Wi-Fi/IP geolocation
+                if (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE) {
+                    console.warn("High accuracy GPS timed out or unavailable; falling back to network geolocation...", err);
+                    navigator.geolocation.getCurrentPosition(
+                        onSuccess,
+                        onError,
+                        { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
+                    );
+                } else {
+                    // Permission denied or other fatal error
+                    onError(err);
+                }
+            },
+            { enableHighAccuracy: true, timeout: 6000, maximumAge: 30000 }
+        );
+    }
+
+    // ============================================================
+    // Request User Location & Center Map
+    // ============================================================
+    function requestUserLocation(isUserInitiated) {
+        if (isLocating) return;
+        isLocating = true;
+
+        const statusText = document.getElementById('geoStatusText');
+        const myLocBtn = document.getElementById('myLocationBtn');
+        const findBtn = document.getElementById('findNearMeBtn');
+
+        // Visual loading feedback
+        myLocBtn.classList.add('locating');
+        myLocBtn.innerHTML = '<i class="fas fa-spinner fa-spin text-primary"></i>';
+        statusText.innerHTML = '<i class="fas fa-spinner fa-spin text-primary mr-1"></i> Accessing GPS coordinates...';
+
+        if (isUserInitiated && findBtn) {
+            findBtn.classList.add('loading');
+            findBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Accessing GPS...';
+        }
+
+        getCurrentGPS(
+            function (pos) {
+                isLocating = false;
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const accuracy = pos.coords.accuracy || 35; // meters
+
+                userLatLng = { lat: lat, lng: lng, accuracy: accuracy };
+
+                // 1. Move map to user's real coordinates with smooth animation
+                map.flyTo([lat, lng], 15, { animate: true, duration: 1.2 });
+
+                // 2. Add or update User Location Marker (prevents duplicate markers)
+                updateUserMarkerAndAccuracy(lat, lng, accuracy);
+
+                // 3. Update status badges
+                statusText.innerHTML = `<i class="fas fa-check-circle text-success mr-1"></i> GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)} (±${Math.round(accuracy)}m)`;
+
+                // 4. Update buttons
+                myLocBtn.classList.remove('locating');
+                myLocBtn.classList.add('active');
+                myLocBtn.innerHTML = '<i class="fas fa-location-crosshairs"></i>';
+                setTimeout(() => myLocBtn.classList.remove('active'), 1500);
+
+                if (findBtn) {
+                    findBtn.classList.remove('loading');
+                    findBtn.innerHTML = '<i class="fas fa-location-dot mr-2"></i> Location Active';
+                }
+
+                // 5. Query nearby restaurants from backend using actual GPS coordinates
+                fetchNearbyApi(lat, lng);
+            },
+            function (err) {
+                isLocating = false;
+                myLocBtn.classList.remove('locating');
+                myLocBtn.innerHTML = '<i class="fas fa-location-crosshairs"></i>';
+
+                if (findBtn) {
+                    findBtn.classList.remove('loading');
+                    findBtn.innerHTML = '<i class="fas fa-location-crosshairs mr-2"></i> Find Restaurants Near Me';
+                }
+
+                let errorMsg = "Unable to retrieve your location.";
+                if (err.code === 1) { // PERMISSION_DENIED
+                    errorMsg = "Location permission denied. Please allow location access in your browser.";
+                } else if (err.code === 2) { // POSITION_UNAVAILABLE
+                    errorMsg = "GPS position unavailable on this device/network.";
+                } else if (err.code === 3) { // TIMEOUT
+                    errorMsg = "GPS request timed out. Please click My Location again.";
+                } else if (err.message) {
+                    errorMsg = err.message;
+                }
+
+                statusText.innerHTML = `<i class="fas fa-exclamation-triangle text-warning mr-1"></i> ${errorMsg}`;
+
+                if (isUserInitiated) {
+                    alert(errorMsg);
+                }
+            }
+        );
+    }
+
+    // ============================================================
+    // Add or Update User Marker & GPS Accuracy Circle
+    // ============================================================
+    function updateUserMarkerAndAccuracy(lat, lng, accuracy) {
+        const userIcon = L.divIcon({
+            className: 'user-gps-div-icon',
+            html: '<div class="user-gps-marker-pulse"><i class="fas fa-user" style="font-size:14px;"></i></div>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18]
+        });
+
+        // 1. User Position Marker
+        if (userMarker) {
+            userMarker.setLatLng([lat, lng]);
+        } else {
+            userMarker = L.marker([lat, lng], {
+                icon: userIcon,
+                zIndexOffset: 1000
+            }).addTo(map);
+        }
+
+        userMarker.bindPopup(`
+            <div style="min-width:180px; text-align:center;">
+                <h6 style="margin-bottom:4px; font-weight:700; color:#0284c7;">
+                    <i class="fas fa-location-dot mr-1"></i> Your Current Location
+                </h6>
+                <small style="color:#64748b; display:block; margin-bottom:4px;">
+                    Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+                </small>
+                <span class="badge badge-info px-2 py-1" style="font-size:10px;">
+                    GPS Accuracy: ±${Math.round(accuracy)} meters
+                </span>
+            </div>
+        `);
+
+        // 2. Accuracy Circle around user position
+        if (userAccuracyCircle) {
+            userAccuracyCircle.setLatLng([lat, lng]);
+            userAccuracyCircle.setRadius(accuracy);
+        } else {
+            userAccuracyCircle = L.circle([lat, lng], {
+                radius: accuracy,
+                color: '#0284c7',
+                fillColor: '#0284c7',
+                fillOpacity: 0.12,
+                weight: 1.5
+            }).addTo(map);
+        }
+    }
+
+    // ============================================================
+    // MY LOCATION BUTTON (Bottom-Right corner)
+    // ============================================================
+    function recenterToMyLocation() {
+        const myLocBtn = document.getElementById('myLocationBtn');
+
+        // If we already have known user coordinates, immediately fly there for instant response
+        if (userLatLng && userLatLng.lat && userLatLng.lng) {
+            map.flyTo([userLatLng.lat, userLatLng.lng], 16, { animate: true, duration: 1.0 });
+            if (userMarker) {
+                userMarker.openPopup();
+            }
+            myLocBtn.classList.add('active');
+            setTimeout(() => myLocBtn.classList.remove('active'), 1000);
+        }
+
+        // Request fresh GPS coordinates to ensure latest position & accuracy
+        requestUserLocation(true);
+    }
+
+    // "Find Restaurants Near Me" button
+    function locateUserAndFetchNearby(isUserClick) {
+        requestUserLocation(isUserClick);
+    }
+
+    // ============================================================
+    // LAYER SWITCHER: Standard Street ↔ Satellite View
+    // ============================================================
+    function toggleMapLayer() {
+        const btn = document.getElementById('layerSwitchBtn');
+        const label = document.getElementById('layerLabel');
+
+        if (!isSatellite) {
+            // → Switch to Satellite
+            map.removeLayer(streetLayer);
+            satelliteLayer.addTo(map);
+            // Ensure markers and user location stay on top
+            if (!map.hasLayer(markersLayer)) markersLayer.addTo(map);
+            if (userAccuracyCircle && !map.hasLayer(userAccuracyCircle)) userAccuracyCircle.addTo(map);
+            if (userMarker && !map.hasLayer(userMarker)) userMarker.addTo(map);
+
+            isSatellite = true;
+            btn.classList.add('satellite-active');
+            btn.title = 'Switch to Standard Street Map view';
+            btn.innerHTML = '<i class="fas fa-map"></i>';
+            label.innerHTML = '<i class="fas fa-circle text-warning mr-1" style="font-size:8px;"></i> Satellite View';
+        } else {
+            // → Switch to Street Map
+            map.removeLayer(satelliteLayer);
+            streetLayer.addTo(map);
+            if (!map.hasLayer(markersLayer)) markersLayer.addTo(map);
+            if (userAccuracyCircle && !map.hasLayer(userAccuracyCircle)) userAccuracyCircle.addTo(map);
+            if (userMarker && !map.hasLayer(userMarker)) userMarker.addTo(map);
+
+            isSatellite = false;
+            btn.classList.remove('satellite-active');
+            btn.title = 'Switch to Satellite view';
+            btn.innerHTML = '<i class="fas fa-satellite-dish"></i>';
+            label.innerHTML = '<i class="fas fa-circle text-success mr-1" style="font-size:8px;"></i> Street Map';
+        }
+    }
+
+    // ============================================================
+    // RESTAURANT MARKERS ON MAP
+    // ============================================================
+    function plotRestaurantsOnMap(restaurantsData) {
+        markersLayer.clearLayers();
+
+        const restaurantIcon = L.divIcon({
+            className: 'custom-rest-icon',
+            html: '<div style="background:#e23744;color:#fff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,0.3);border:2px solid white;"><i class="fas fa-utensils"></i></div>',
+            iconSize: [34, 34],
+            iconAnchor: [17, 34],
+            popupAnchor: [0, -34]
+        });
+
+        if (restaurantsData && restaurantsData.length > 0) {
+            // Data from nearby API (includes calculated distance)
+            restaurantsData.forEach(r => {
+                if (r.latitude === null || r.longitude === null || isNaN(r.latitude) || isNaN(r.longitude)) return;
+
+                const marker = L.marker([r.latitude, r.longitude], { icon: restaurantIcon }).addTo(markersLayer);
+                const distText = r.distance_km !== undefined ? `(${r.distance_km} km away)` : '';
+
+                marker.bindPopup(`
+                    <div style="min-width:200px;">
+                        <h6 style="margin-bottom:4px;font-weight:700;color:#0f172a;">${r.name}</h6>
+                        <small style="color:#64748b;display:block;margin-bottom:6px;">${r.cuisine}</small>
+                        <div style="margin-bottom:8px;">
+                            <span style="background:#10b981;color:white;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:bold;">⭐ ${r.rating}</span>
+                            <span style="font-size:11px;color:#64748b;margin-left:4px;">${distText}</span>
+                        </div>
+                        <p style="font-size:11px;color:#64748b;margin-bottom:8px;word-break:break-word;">${r.address}</p>
+                        <div style="display:flex;gap:4px;">
+                            <a href="/restaurant/${r.id}" style="background:#e23744;color:white;padding:4px 10px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;">Menu</a>
+                            <a href="${r.directions_url}" target="_blank" style="background:#f1f5f9;color:#334155;padding:4px 10px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;">Directions</a>
+                        </div>
+                    </div>
+                `);
+            });
+        } else {
+            // Plot from rendered DOM attributes (initial load before GPS call)
+            document.querySelectorAll('.restaurant-card-item').forEach(item => {
+                const lat = parseFloat(item.getAttribute('data-lat'));
+                const lng = parseFloat(item.getAttribute('data-lng'));
+                const name = (item.querySelector('.card-title') || {}).textContent || '';
+                const id = item.getAttribute('data-id');
+                const cuisine = item.getAttribute('data-cuisine') || '';
+
+                if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                    const marker = L.marker([lat, lng], { icon: restaurantIcon }).addTo(markersLayer);
+                    marker.bindPopup(`
+                        <div style="min-width:170px;">
+                            <h6 style="margin-bottom:4px;font-weight:700;">${name.trim()}</h6>
+                            <small style="color:#64748b;display:block;margin-bottom:8px;">${cuisine}</small>
+                            <a href="/restaurant/${id}" style="background:#e23744;color:white;padding:4px 10px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;">View Menu &rarr;</a>
+                        </div>
+                    `);
+                }
+            });
+        }
+    }
+
+    // Click on restaurant card — smoothly pan/fly to marker on map & open popup
+    function focusRestaurantOnMap(lat, lng, name) {
+        if (!lat || !lng || isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) return;
+        lat = parseFloat(lat);
+        lng = parseFloat(lng);
+        map.flyTo([lat, lng], 16, { animate: true, duration: 1.0 });
+
+        markersLayer.eachLayer(function (layer) {
+            if (layer.getLatLng) {
+                const ll = layer.getLatLng();
+                if (Math.abs(ll.lat - lat) < 0.0003 && Math.abs(ll.lng - lng) < 0.0003) {
+                    layer.openPopup();
+                }
+            }
+        });
+    }
+
+    // ============================================================
+    // BACKEND NEARBY RESTAURANTS API CALL
+    // ============================================================
+    function fetchNearbyApi(lat, lng) {
+        const distVal = document.getElementById('distanceFilter').value;
+        let url = `/api/restaurants/nearby?lat=${lat}&lng=${lng}`;
+        if (distVal !== 'all') {
+            url += `&max_distance=${distVal}`;
+        }
+
+        fetch(url)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                const restaurants = data.restaurants || [];
+                plotRestaurantsOnMap(restaurants);
+                renderNearbyCards(restaurants, distVal);
+            })
+            .catch(err => {
+                console.error('Error fetching nearby restaurants:', err);
+                document.getElementById('geoStatusText').innerHTML =
+                    '<i class="fas fa-exclamation-triangle text-danger mr-1"></i> Failed to query nearby restaurants.';
+            });
+    }
+
+    function applyDistanceFilter() {
+        if (userLatLng && userLatLng.lat && userLatLng.lng) {
+            fetchNearbyApi(userLatLng.lat, userLatLng.lng);
+        } else {
+            // If GPS is not available yet, prompt user to locate
+            requestUserLocation(true);
+        }
+    }
+
+    // ============================================================
+    // RENDER RESTAURANT CARDS DYNAMICALLY
+    // ============================================================
+    function renderNearbyCards(restaurants, distVal) {
+        const container = document.getElementById('restaurantCardsContainer');
+        const countBadge = document.getElementById('restaurantCountBadge');
+        countBadge.textContent = `${restaurants.length} Available`;
+
+        if (restaurants.length === 0) {
+            const distLabel = distVal === 'all' ? 'any' : `${distVal} km`;
+            container.innerHTML = `
+                <div class="col-12 text-center py-5 bg-white rounded-lg shadow-sm">
+                    <i class="fas fa-store-slash fa-3x text-muted mb-3"></i>
+                    <h4 class="font-weight-bold">No partner restaurants found within ${distLabel}</h4>
+                    <p class="text-muted mb-3">Try selecting a larger distance filter (e.g. 10 km or All Distances).</p>
+                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="document.getElementById('distanceFilter').value='all'; applyDistanceFilter();">
+                        <i class="fas fa-arrows-left-right mr-1"></i> Show All Available Restaurants
+                    </button>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        restaurants.forEach(r => {
+            const imgSrc = r.image_url || '/static/profile_pics/default.webp';
+            const safeName = (r.name || '').replace(/'/g, "\\'");
+            const distBadge = r.distance_km !== undefined
+                ? `<div class="position-absolute distance-tag" style="bottom: 12px; left: 12px; display: block;">
+                       <span class="badge badge-dark px-2 py-1 shadow-sm font-weight-bold">
+                           <i class="fas fa-route text-warning mr-1"></i> ${r.distance_km} km away
+                       </span>
+                   </div>` : '';
+
+            html += `
+                <div class="col-md-6 col-lg-4 mb-4 restaurant-card-item"
+                     data-name="${(r.name || '').toLowerCase()}"
+                     data-cuisine="${(r.cuisine || '').toLowerCase()}"
+                     data-lat="${r.latitude}" data-lng="${r.longitude}" data-id="${r.id}"
+                     style="cursor:pointer;"
+                     onclick="focusRestaurantOnMap(${r.latitude}, ${r.longitude}, '${safeName}')">
+                    <div class="card restaurant-card h-100">
+                        <div class="position-relative">
+                            <img src="${imgSrc}" alt="${r.name}" loading="lazy"
+                                 onerror="this.onerror=null;this.src='/static/profile_pics/default.webp'">
+                            <div class="position-absolute" style="top:12px;right:12px;">
+                                <span class="badge badge-success px-2 py-1 shadow-sm font-weight-bold">
+                                    <i class="fas fa-star mr-1"></i> ${r.rating}
+                                </span>
+                            </div>
+                            ${distBadge}
+                        </div>
+                        <div class="card-body p-3 d-flex flex-column">
+                            <h5 class="card-title font-weight-bold mb-1">${r.name}</h5>
+                            <p class="text-danger small font-weight-bold mb-2">
+                                <i class="fas fa-bowl-food mr-1"></i> ${r.cuisine}
+                            </p>
+                            <p class="text-muted small mb-2 text-truncate">
+                                <i class="fas fa-location-dot text-muted mr-1"></i> ${r.address}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                                <a href="${r.directions_url}" target="_blank"
+                                   class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()">
+                                    <i class="fas fa-diamond-turn-right mr-1"></i> Directions
+                                </a>
+                                <a href="/restaurant/${r.id}"
+                                   class="btn btn-sm btn-primary px-3" onclick="event.stopPropagation()">
+                                    View Menu &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    // CLIENT-SIDE SEARCH FILTER
+    // ============================================================
+    function filterRestaurantsClientSide() {
+        const query = document.getElementById('restaurantSearch').value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.restaurant-card-item');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const name = card.getAttribute('data-name') || '';
+            const cuisine = card.getAttribute('data-cuisine') || '';
+            if (!query || name.includes(query) || cuisine.includes(query)) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        document.getElementById('restaurantCountBadge').textContent = `${visibleCount} Available`;
+    }
+</script>
+{% endblock %}

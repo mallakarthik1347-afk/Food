@@ -1,58 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="container mt-5">
-  <div class="card shadow-sm rounded-4 border-0">
-    <div class="card-body p-5">
-
-      <h2 class="fw-bold text-primary mb-4">My Orders</h2>
-
-      {% if orders %}
-        <table class="table table-striped align-middle">
-          <thead class="table-light">
-            <tr>
-              <th scope="col">Order ID</th>
-              <th scope="col">Date</th>
-              <th scope="col">Total</th>
-              <th scope="col">Status</th>
-              <th scope="col" class="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for order in orders %}
-              <tr>
-                <td>#{{ order.id }}</td>
-                <td>{{ order.date_ordered.strftime('%b %d, %Y %I:%M %p') }}</td>
-                <td>${{ "%.2f"|format(order.total_price) }}</td>
-                <td>
-                  <span class="badge
-                    {% if order.status.lower() == 'delivered' %} badge-success
-                    {% elif order.status.lower() == 'out for delivery' %} badge-info
-                    {% elif order.status.lower() == 'preparing' %} badge-warning
-                    {% elif order.status.lower() == 'cancelled' %} badge-danger
-                    {% else %} badge-secondary {% endif %}
-                  ">
-                    {{ order.status|capitalize }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  <a href="{{ url_for('view_order', order_id=order.id) }}" class="btn btn-sm btn-outline-primary">
-                    View Details
-                  </a>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <div class="text-center py-4">
-          <p class="text-muted fs-5">You haven’t placed any orders yet.</p>
-          <a href="{{ url_for('menu') }}" class="btn btn-primary mt-3">Browse Menu</a>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="font-weight-bold mb-1">My Orders</h1>
+                <p class="text-muted mb-0">View past food orders, track live deliveries, and rate your meals.</p>
+            </div>
+            <a href="{{ url_for('menu') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="fas fa-plus mr-1"></i> Order More Food
+            </a>
         </div>
-      {% endif %}
 
+        {% if orders %}
+            {% for order in orders %}
+            <div class="card border-0 shadow-sm rounded-lg p-4 mb-4 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                        <span class="h5 font-weight-bold text-dark mr-2">Order #{{ order.id }}</span>
+                        <span class="text-muted small">
+                            <i class="fas fa-calendar-day mr-1"></i> {{ order.date_ordered.strftime('%B %d, %Y at %I:%M %p') }}
+                        </span>
+                    </div>
+                    <div class="mt-2 mt-md-0">
+                        <span class="badge
+                            {% if order.status == 'Delivered' %} badge-success
+                            {% elif order.status == 'Cancelled' %} badge-danger
+                            {% elif order.status == 'Out for Delivery' %} badge-info
+                            {% elif order.status == 'Preparing Food' or order.status == 'Preparing' %} badge-warning text-dark
+                            {% else %} badge-primary {% endif %}
+                            px-3 py-2 font-weight-bold" style="font-size: 0.95rem;">
+                            {{ order.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row align-items-center py-3">
+                    <div class="col-md-7 mb-3 mb-md-0">
+                        {% if order.restaurant %}
+                        <div class="small font-weight-bold text-danger mb-1">
+                            <i class="fas fa-store mr-1"></i> {{ order.restaurant.name }}
+                        </div>
+                        {% endif %}
+
+                        <div class="text-muted small">
+                            {% for item in order.items %}
+                                <span>{{ item.menu_item.name }} &times; {{ item.quantity }}{% if not loop.last %}, {% endif %}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="small text-muted mt-2">
+                            <i class="fas fa-location-dot text-muted mr-1"></i> {{ order.delivery_address }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 text-md-right">
+                        <div class="h4 font-weight-bold text-danger mb-2">
+                            ${{ "%.2f"|format(order.total_price) }}
+                        </div>
+
+                        <div class="d-flex justify-content-md-end gap-2">
+                            <a href="{{ url_for('track_order', order_id=order.id) }}" class="btn btn-sm btn-outline-success font-weight-bold px-3 mr-2">
+                                <i class="fas fa-route mr-1"></i> Track Order
+                            </a>
+
+                            {% if order.restaurant %}
+                                <a href="{{ url_for('restaurant_detail', restaurant_id=order.restaurant.id) }}" class="btn btn-sm btn-outline-secondary px-3">
+                                    <i class="fas fa-star mr-1 text-warning"></i> Review
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="card border-0 shadow-sm rounded-lg p-5 text-center bg-white">
+            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+            <h4 class="font-weight-bold">You haven't placed any orders yet</h4>
+            <p class="text-muted mb-4">Discover tasty dishes from nearby restaurants and place your first order!</p>
+            <div>
+                <a href="{{ url_for('menu') }}" class="btn btn-primary rounded-pill px-4 py-2 font-weight-bold">
+                    Explore Menu Now
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
-  </div>
 </div>
 
-{% endblock content %}
+{% endblock %}

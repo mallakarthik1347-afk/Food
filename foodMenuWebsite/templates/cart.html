@@ -1,297 +1,164 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-  <div class="row">
-    
-    <!-- Cart Items Section -->
-    <div class="col-lg-8">
-      <div class="cart-card mb-4 border-0">
-        <h2 class="fw-bold mb-4" style="color: var(--text-color);">My Cart</h2>
 
-        {% if cart_items %}
-          <div class="table-responsive">
-            <table class="table align-middle border-bottom-0">
-              <thead>
-                <tr>
-                  <th scope="col">Product</th>
-                  <th scope="col">Quantity</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Subtotal</th>
-                  <th scope="col" class="text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in cart_items %}
-                  <tr>
-                    <td>
-                      <div class="d-flex align-items-center">
-            {% set image_url = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" %}
-            {% if item.menu_item.name == 'Margherita Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Pepperoni Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'BBQ Chicken Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Veggie Delight Pizza' %}{% set image_url = "https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Veggie Burger' %}{% set image_url = "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Cheese Burst Burger' %}{% set image_url = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Crispy Chicken Burger' %}{% set image_url = "https://images.unsplash.com/photo-1615719417387-34fa76fb4bb1?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Smoky BBQ Burger' %}{% set image_url = "https://images.unsplash.com/photo-1594212586737-cd3eb3811f5e?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Pasta Alfredo' %}{% set image_url = "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Red Sauce Pasta' %}{% set image_url = "https://images.unsplash.com/photo-1621510456681-2330135e5d16?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Pesto Pasta' %}{% set image_url = "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Four Cheese Pasta' %}{% set image_url = "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Cold Coffee' %}{% set image_url = "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Lemon Iced Tea' %}{% set image_url = "https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Strawberry Milkshake' %}{% set image_url = "https://images.unsplash.com/photo-1579954115545-a95591f28bfc?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Mojito' %}{% set image_url = "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Caesar Salad' %}{% set image_url = "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Greek Salad' %}{% set image_url = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Garden Fresh Salad' %}{% set image_url = "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Protein Salad' %}{% set image_url = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'French Fries' %}{% set image_url = "https://images.unsplash.com/photo-1576107255648-5c421bffe237?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Peri Peri Fries' %}{% set image_url = "https://images.unsplash.com/photo-1590301157890-4810ed352733?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Garlic Bread' %}{% set image_url = "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Cheesy Nachos' %}{% set image_url = "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Chocolate Cake' %}{% set image_url = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Brownie with Ice Cream' %}{% set image_url = "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Donuts' %}{% set image_url = "https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=1000&auto=format&fit=crop" %}
-            {% elif item.menu_item.name == 'Fruit Bowl' %}{% set image_url = "https://images.unsplash.com/photo-1490474504059-1edb178b881b?q=80&w=1000&auto=format&fit=crop" %}
-                        {% elif item.menu_item.name == 'Hyderabadi Chicken Biryani' %}{% set image_url = "https://images.pexels.com/photos/5410401/pexels-photo-5410401.jpeg?cs=srgb&dl=pexels-saveurs-secretes-5410401.jpg&fm=jpg" %}
-            {% elif item.menu_item.name == 'Hyderabadi Mutton Biryani' %}{% set image_url = "https://images.pexels.com/photos/9609846/pexels-photo-9609846.jpeg?cs=srgb&dl=pexels-prabal-pratap-singh-9609846.jpg&fm=jpg" %}
-            {% elif item.menu_item.name == 'Lucknowi Dum Biryani' %}{% set image_url = "https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?cs=srgb&dl=close-up-cuisine-delicious-958546.jpg&fm=jpg" %}
-            {% elif item.menu_item.name == 'Kolkata Biryani' %}{% set image_url = "https://images.pexels.com/photos/8921573/pexels-photo-8921573.jpeg?h=1000&w=1500&fit=crop&markalign=center,middle&txt=pexels.com&txtalign=center&txtsize=60&txtclr=eeffffff&txtfont=Avenir-Heavy&txtshad=10&mark=https://assets.imgix.net/~text?txtclr=fff&txtsize=120&txtpad=20&bg=80000000&txtfont=Avenir-Heavy&txtalign=center&w=1300&txt=Free%20Stock%20Photos" %}
-            {% elif item.menu_item.name == 'Paneer Biryani' %}{% set image_url = "https://loremflickr.com/800/600/Paneer%20Biryani,food/all" %}
-            {% elif item.menu_item.name == 'Veg Dum Biryani' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Dum%20Biryani,food/all" %}
-            {% elif item.menu_item.name == 'Egg Biryani' %}{% set image_url = "https://loremflickr.com/800/600/Egg%20Biryani,food/all" %}
-            {% elif item.menu_item.name == 'North Indian Royal Thali' %}{% set image_url = "https://loremflickr.com/800/600/North%20Indian%20Royal%20Thali,food/all" %}
-            {% elif item.menu_item.name == 'South Indian Traditional Thali' %}{% set image_url = "https://loremflickr.com/800/600/South%20Indian%20Traditional%20Thali,food/all" %}
-            {% elif item.menu_item.name == 'Gujarati Thali' %}{% set image_url = "https://loremflickr.com/800/600/Gujarati%20Thali,food/all" %}
-            {% elif item.menu_item.name == 'Rajasthani Thali' %}{% set image_url = "https://loremflickr.com/800/600/Rajasthani%20Thali,food/all" %}
-            {% elif item.menu_item.name == 'Maharashtrian Thali' %}{% set image_url = "https://loremflickr.com/800/600/Maharashtrian%20Thali,food/all" %}
-            {% elif item.menu_item.name == 'Punjabi Special Thali' %}{% set image_url = "https://loremflickr.com/800/600/Punjabi%20Special%20Thali,food/all" %}
-            {% elif item.menu_item.name == 'Gulab Jamun' %}{% set image_url = "https://loremflickr.com/800/600/Gulab%20Jamun,food/all" %}
-            {% elif item.menu_item.name == 'Rasgulla' %}{% set image_url = "https://loremflickr.com/800/600/Rasgulla,food/all" %}
-            {% elif item.menu_item.name == 'Kaju Katli' %}{% set image_url = "https://loremflickr.com/800/600/Kaju%20Katli,food/all" %}
-            {% elif item.menu_item.name == 'Jalebi' %}{% set image_url = "https://loremflickr.com/800/600/Jalebi,food/all" %}
-            {% elif item.menu_item.name == 'Rasmalai' %}{% set image_url = "https://loremflickr.com/800/600/Rasmalai,food/all" %}
-            {% elif item.menu_item.name == 'Motichoor Laddu' %}{% set image_url = "https://loremflickr.com/800/600/Motichoor%20Laddu,food/all" %}
-            {% elif item.menu_item.name == 'Mysore Pak' %}{% set image_url = "https://loremflickr.com/800/600/Mysore%20Pak,food/all" %}
-            {% elif item.menu_item.name == 'Samosa' %}{% set image_url = "https://loremflickr.com/800/600/Samosa,food/all" %}
-            {% elif item.menu_item.name == 'Aloo Tikki Chaat' %}{% set image_url = "https://loremflickr.com/800/600/Aloo%20Tikki%20Chaat,food/all" %}
-            {% elif item.menu_item.name == 'Pani Puri' %}{% set image_url = "https://loremflickr.com/800/600/Pani%20Puri,food/all" %}
-            {% elif item.menu_item.name == 'Dahi Puri' %}{% set image_url = "https://loremflickr.com/800/600/Dahi%20Puri,food/all" %}
-            {% elif item.menu_item.name == 'Pav Bhaji' %}{% set image_url = "https://loremflickr.com/800/600/Pav%20Bhaji,food/all" %}
-            {% elif item.menu_item.name == 'Vada Pav' %}{% set image_url = "https://loremflickr.com/800/600/Vada%20Pav,food/all" %}
-            {% elif item.menu_item.name == 'Masala Corn' %}{% set image_url = "https://loremflickr.com/800/600/Masala%20Corn,food/all" %}
-            {% elif item.menu_item.name == 'Bread Pakora' %}{% set image_url = "https://loremflickr.com/800/600/Bread%20Pakora,food/all" %}
-            {% elif item.menu_item.name == 'Butter Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Butter%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Amritsari Kulcha' %}{% set image_url = "https://loremflickr.com/800/600/Amritsari%20Kulcha,food/all" %}
-            {% elif item.menu_item.name == 'Sarson da Saag with Makki di Roti' %}{% set image_url = "https://loremflickr.com/800/600/Sarson%20da%20Saag%20with%20Makki%20di%20Roti,food/all" %}
-            {% elif item.menu_item.name == 'Paneer Butter Masala' %}{% set image_url = "https://loremflickr.com/800/600/Paneer%20Butter%20Masala,food/all" %}
-            {% elif item.menu_item.name == 'Dal Makhani' %}{% set image_url = "https://loremflickr.com/800/600/Dal%20Makhani,food/all" %}
-            {% elif item.menu_item.name == 'Chole Bhature' %}{% set image_url = "https://loremflickr.com/800/600/Chole%20Bhature,food/all" %}
-            {% elif item.menu_item.name == 'Tandoori Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Tandoori%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Paneer Tikka' %}{% set image_url = "https://loremflickr.com/800/600/Paneer%20Tikka,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Tikka' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Tikka,food/all" %}
-            {% elif item.menu_item.name == 'Sweet Lassi' %}{% set image_url = "https://loremflickr.com/800/600/Sweet%20Lassi,food/all" %}
-            {% elif item.menu_item.name == 'Andhra Chicken Curry' %}{% set image_url = "https://loremflickr.com/800/600/Andhra%20Chicken%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Gongura Mutton' %}{% set image_url = "https://loremflickr.com/800/600/Gongura%20Mutton,food/all" %}
-            {% elif item.menu_item.name == 'Andhra Fish Fry' %}{% set image_url = "https://loremflickr.com/800/600/Andhra%20Fish%20Fry,food/all" %}
-            {% elif item.menu_item.name == 'Kodi Vepudu' %}{% set image_url = "https://loremflickr.com/800/600/Kodi%20Vepudu,food/all" %}
-            {% elif item.menu_item.name == 'Andhra Prawn Curry' %}{% set image_url = "https://loremflickr.com/800/600/Andhra%20Prawn%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Royyala Iguru' %}{% set image_url = "https://loremflickr.com/800/600/Royyala%20Iguru,food/all" %}
-            {% elif item.menu_item.name == 'Andhra Spicy Biryani' %}{% set image_url = "https://loremflickr.com/800/600/Andhra%20Spicy%20Biryani,food/all" %}
-            {% elif item.menu_item.name == 'Tomato Pappu' %}{% set image_url = "https://loremflickr.com/800/600/Tomato%20Pappu,food/all" %}
-            {% elif item.menu_item.name == 'Andhra Rasam' %}{% set image_url = "https://loremflickr.com/800/600/Andhra%20Rasam,food/all" %}
-            {% elif item.menu_item.name == 'Gutti Vankaya Curry' %}{% set image_url = "https://loremflickr.com/800/600/Gutti%20Vankaya%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Chettinad Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Chettinad%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Chettinad Biryani' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Chettinad%20Biryani,food/all" %}
-            {% elif item.menu_item.name == 'Karaikudi Mutton Curry' %}{% set image_url = "https://loremflickr.com/800/600/Karaikudi%20Mutton%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Idli with Sambar' %}{% set image_url = "https://loremflickr.com/800/600/Idli%20with%20Sambar,food/all" %}
-            {% elif item.menu_item.name == 'Dosa with Chutney' %}{% set image_url = "https://loremflickr.com/800/600/Dosa%20with%20Chutney,food/all" %}
-            {% elif item.menu_item.name == 'Pongal' %}{% set image_url = "https://loremflickr.com/800/600/Pongal,food/all" %}
-            {% elif item.menu_item.name == 'Lemon Rice' %}{% set image_url = "https://loremflickr.com/800/600/Lemon%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Tamarind Rice' %}{% set image_url = "https://loremflickr.com/800/600/Tamarind%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Medu Vada' %}{% set image_url = "https://loremflickr.com/800/600/Medu%20Vada,food/all" %}
-            {% elif item.menu_item.name == 'Filter Coffee' %}{% set image_url = "https://loremflickr.com/800/600/Filter%20Coffee,food/all" %}
-            {% elif item.menu_item.name == 'Kerala Fish Curry' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Fish%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Malabar Chicken Biryani' %}{% set image_url = "https://loremflickr.com/800/600/Malabar%20Chicken%20Biryani,food/all" %}
-            {% elif item.menu_item.name == 'Appam with Vegetable Stew' %}{% set image_url = "https://loremflickr.com/800/600/Appam%20with%20Vegetable%20Stew,food/all" %}
-            {% elif item.menu_item.name == 'Kerala Prawn Curry' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Prawn%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Kerala Beef Fry' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Beef%20Fry,food/all" %}
-            {% elif item.menu_item.name == 'Kerala Parotta with Curry' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Parotta%20with%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Avial' %}{% set image_url = "https://loremflickr.com/800/600/Avial,food/all" %}
-            {% elif item.menu_item.name == 'Kerala Sadya' %}{% set image_url = "https://loremflickr.com/800/600/Kerala%20Sadya,food/all" %}
-            {% elif item.menu_item.name == 'Banana Chips' %}{% set image_url = "https://loremflickr.com/800/600/Banana%20Chips,food/all" %}
-            {% elif item.menu_item.name == 'Payasam' %}{% set image_url = "https://loremflickr.com/800/600/Payasam,food/all" %}
-            {% elif item.menu_item.name == 'Misal Pav' %}{% set image_url = "https://loremflickr.com/800/600/Misal%20Pav,food/all" %}
-            {% elif item.menu_item.name == 'Puran Poli' %}{% set image_url = "https://loremflickr.com/800/600/Puran%20Poli,food/all" %}
-            {% elif item.menu_item.name == 'Sabudana Khichdi' %}{% set image_url = "https://loremflickr.com/800/600/Sabudana%20Khichdi,food/all" %}
-            {% elif item.menu_item.name == 'Kanda Bhaji' %}{% set image_url = "https://loremflickr.com/800/600/Kanda%20Bhaji,food/all" %}
-            {% elif item.menu_item.name == 'Thalipeeth' %}{% set image_url = "https://loremflickr.com/800/600/Thalipeeth,food/all" %}
-            {% elif item.menu_item.name == 'Kolhapuri Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Kolhapuri%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Kolhapuri Mutton' %}{% set image_url = "https://loremflickr.com/800/600/Kolhapuri%20Mutton,food/all" %}
-            {% elif item.menu_item.name == 'Modak' %}{% set image_url = "https://loremflickr.com/800/600/Modak,food/all" %}
-            {% elif item.menu_item.name == 'Dal Baati Churma' %}{% set image_url = "https://loremflickr.com/800/600/Dal%20Baati%20Churma,food/all" %}
-            {% elif item.menu_item.name == 'Gatte ki Sabzi' %}{% set image_url = "https://loremflickr.com/800/600/Gatte%20ki%20Sabzi,food/all" %}
-            {% elif item.menu_item.name == 'Laal Maas' %}{% set image_url = "https://loremflickr.com/800/600/Laal%20Maas,food/all" %}
-            {% elif item.menu_item.name == 'Ker Sangri' %}{% set image_url = "https://loremflickr.com/800/600/Ker%20Sangri,food/all" %}
-            {% elif item.menu_item.name == 'Rajasthani Kadhi' %}{% set image_url = "https://loremflickr.com/800/600/Rajasthani%20Kadhi,food/all" %}
-            {% elif item.menu_item.name == 'Bajra Roti with Garlic Chutney' %}{% set image_url = "https://loremflickr.com/800/600/Bajra%20Roti%20with%20Garlic%20Chutney,food/all" %}
-            {% elif item.menu_item.name == 'Mawa Kachori' %}{% set image_url = "https://loremflickr.com/800/600/Mawa%20Kachori,food/all" %}
-            {% elif item.menu_item.name == 'Mirchi Vada' %}{% set image_url = "https://loremflickr.com/800/600/Mirchi%20Vada,food/all" %}
-            {% elif item.menu_item.name == 'Ghewar' %}{% set image_url = "https://loremflickr.com/800/600/Ghewar,food/all" %}
-            {% elif item.menu_item.name == 'Veg Hakka Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Hakka%20Noodles,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Hakka Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Hakka%20Noodles,food/all" %}
-            {% elif item.menu_item.name == 'Schezwan Fried Rice' %}{% set image_url = "https://loremflickr.com/800/600/Schezwan%20Fried%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Manchurian' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Manchurian,food/all" %}
-            {% elif item.menu_item.name == 'Veg Manchurian' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Manchurian,food/all" %}
-            {% elif item.menu_item.name == 'Spring Rolls' %}{% set image_url = "https://loremflickr.com/800/600/Spring%20Rolls,food/all" %}
-            {% elif item.menu_item.name == 'Hot and Sour Soup' %}{% set image_url = "https://loremflickr.com/800/600/Hot%20and%20Sour%20Soup,food/all" %}
-            {% elif item.menu_item.name == 'Chili Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Chili%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Garlic Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Garlic%20Noodles,food/all" %}
-            {% elif item.menu_item.name == 'Pad Thai Noodles' %}{% set image_url = "https://loremflickr.com/800/600/Pad%20Thai%20Noodles,food/all" %}
-            {% elif item.menu_item.name == 'Thai Green Curry' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Green%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Thai Red Curry' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Red%20Curry,food/all" %}
-            {% elif item.menu_item.name == 'Thai Basil Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Basil%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Mango Sticky Rice' %}{% set image_url = "https://loremflickr.com/800/600/Mango%20Sticky%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Thai Fried Rice' %}{% set image_url = "https://loremflickr.com/800/600/Thai%20Fried%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Tom Yum Soup' %}{% set image_url = "https://loremflickr.com/800/600/Tom%20Yum%20Soup,food/all" %}
-            {% elif item.menu_item.name == 'Pineapple Fried Rice' %}{% set image_url = "https://loremflickr.com/800/600/Pineapple%20Fried%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Mexican Burrito Bowl' %}{% set image_url = "https://loremflickr.com/800/600/Mexican%20Burrito%20Bowl,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Quesadilla' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Quesadilla,food/all" %}
-            {% elif item.menu_item.name == 'Beef Tacos' %}{% set image_url = "https://loremflickr.com/800/600/Beef%20Tacos,food/all" %}
-            {% elif item.menu_item.name == 'Veg Enchiladas' %}{% set image_url = "https://loremflickr.com/800/600/Veg%20Enchiladas,food/all" %}
-            {% elif item.menu_item.name == 'Nachos Supreme' %}{% set image_url = "https://loremflickr.com/800/600/Nachos%20Supreme,food/all" %}
-            {% elif item.menu_item.name == 'Mexican Street Corn' %}{% set image_url = "https://loremflickr.com/800/600/Mexican%20Street%20Corn,food/all" %}
-            {% elif item.menu_item.name == 'Chimichanga' %}{% set image_url = "https://loremflickr.com/800/600/Chimichanga,food/all" %}
-            {% elif item.menu_item.name == 'Jollof Rice' %}{% set image_url = "https://loremflickr.com/800/600/Jollof%20Rice,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Yassa' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Yassa,food/all" %}
-            {% elif item.menu_item.name == 'Bunny Chow' %}{% set image_url = "https://loremflickr.com/800/600/Bunny%20Chow,food/all" %}
-            {% elif item.menu_item.name == 'Moroccan Chicken Tagine' %}{% set image_url = "https://loremflickr.com/800/600/Moroccan%20Chicken%20Tagine,food/all" %}
-            {% elif item.menu_item.name == 'Couscous Royal' %}{% set image_url = "https://loremflickr.com/800/600/Couscous%20Royal,food/all" %}
-            {% elif item.menu_item.name == 'Peri Peri Chicken' %}{% set image_url = "https://loremflickr.com/800/600/Peri%20Peri%20Chicken,food/all" %}
-            {% elif item.menu_item.name == 'Ethiopian Doro Wat' %}{% set image_url = "https://loremflickr.com/800/600/Ethiopian%20Doro%20Wat,food/all" %}
-            {% elif item.menu_item.name == 'Spaghetti Carbonara' %}{% set image_url = "https://loremflickr.com/800/600/Spaghetti%20Carbonara,food/all" %}
-            {% elif item.menu_item.name == 'Mushroom Risotto' %}{% set image_url = "https://loremflickr.com/800/600/Mushroom%20Risotto,food/all" %}
-            {% elif item.menu_item.name == 'Chicken Alfredo Pasta' %}{% set image_url = "https://loremflickr.com/800/600/Chicken%20Alfredo%20Pasta,food/all" %}
-            {% elif item.menu_item.name == 'Fish and Chips' %}{% set image_url = "https://loremflickr.com/800/600/Fish%20and%20Chips,food/all" %}
-            {% elif item.menu_item.name == 'Grilled Lamb Steak' %}{% set image_url = "https://loremflickr.com/800/600/Grilled%20Lamb%20Steak,food/all" %}
-            {% elif item.menu_item.name == 'Lasagna' %}{% set image_url = "https://loremflickr.com/800/600/Lasagna,food/all" %}
-            {% elif item.menu_item.name == 'Bruschetta' %}{% set image_url = "https://loremflickr.com/800/600/Bruschetta,food/all" %}
-            {% elif item.menu_item.name == 'French Onion Soup' %}{% set image_url = "https://loremflickr.com/800/600/French%20Onion%20Soup,food/all" %}
+<div class="row">
+    <!-- CART ITEMS COLUMN -->
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm rounded-lg p-4 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="font-weight-bold mb-0">My Cart</h2>
+                {% if cart_items %}
+                <span class="badge badge-pill badge-primary px-3 py-2 font-weight-bold">
+                    {{ cart_items|length }} Item{% if cart_items|length > 1 %}s{% endif %}
+                </span>
+                {% endif %}
+            </div>
+
+            {% if cart_items %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="text-muted small text-uppercase font-weight-bold border-bottom">
+                        <tr>
+                            <th scope="col" style="border-top: none;">Item</th>
+                            <th scope="col" style="border-top: none;" class="text-center">Quantity</th>
+                            <th scope="col" style="border-top: none;" class="text-right">Price</th>
+                            <th scope="col" style="border-top: none;" class="text-right">Subtotal</th>
+                            <th scope="col" style="border-top: none;" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr class="border-bottom">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.menu_item.image_url or url_for('static', filename='profile_pics/special_biryani.jpg') }}"
+                                         alt="{{ item.menu_item.name }}"
+                                         class="rounded mr-3 border"
+                                         style="width: 60px; height: 60px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="font-weight-bold mb-0">
+                                            <a href="{{ url_for('food_detail', item_id=item.menu_item.id) }}" class="text-dark">
+                                                {{ item.menu_item.name }}
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted">
+                                            {% if item.menu_item.is_veg %}
+                                                <span class="badge-veg-dot"></span> Veg
+                                            {% else %}
+                                                <span class="badge-nonveg-dot"></span> Non-Veg
+                                            {% endif %}
+                                            &bull; {{ item.menu_item.category|capitalize }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Quantity Stepper -->
+                            <td class="text-center">
+                                <form action="{{ url_for('update_cart', cart_id=item.id) }}" method="POST" class="d-inline-flex align-items-center m-0">
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="50"
+                                           class="form-control form-control-sm text-center mr-1 font-weight-bold"
+                                           style="width: 55px; border-radius: 8px;">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Update Quantity">
+                                        <i class="fas fa-rotate"></i>
+                                    </button>
+                                </form>
+                            </td>
+
+                            <td class="text-right font-weight-bold text-muted">
+                                ${{ "%.2f"|format(item.menu_item.price) }}
+                            </td>
+
+                            <td class="text-right font-weight-bold text-danger">
+                                ${{ "%.2f"|format(item.menu_item.price * item.quantity) }}
+                            </td>
+
+                            <td class="text-center">
+                                <form action="{{ url_for('remove_from_cart', cart_id=item.id) }}" method="POST" class="m-0">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle" title="Remove Item">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <a href="{{ url_for('menu') }}" class="btn btn-link text-muted pl-0">
+                    <i class="fas fa-arrow-left mr-1"></i> Continue Shopping
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-cart-shopping fa-3x text-muted mb-3"></i>
+                <h4 class="font-weight-bold">Your cart is empty</h4>
+                <p class="text-muted mb-4">Add your favorite meals from top restaurants and enjoy fast delivery.</p>
+                <a href="{{ url_for('menu') }}" class="btn btn-primary px-4 py-2 rounded-pill">
+                    Browse Food Menu
+                </a>
+            </div>
             {% endif %}
-
-                        <img src="{{ image_url }}" alt="{{ item.menu_item.name }}" 
-                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
-                        <div>
-                          <h6 class="mb-0 fw-bold">{{ item.menu_item.name }}</h6>
-                          <small class="text-muted">{{ item.menu_item.category|capitalize }}</small>
-                        </div>
-                      </div>
-                    </td>
-
-                    <!-- Quantity Update Form -->
-                    <td>
-                      <form action="{{ url_for('update_cart', cart_id=item.id) }}" method="POST" class="d-flex align-items-center m-0">
-                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
-                               class="form-control text-center mr-2"
-                               style="width: 65px; border-radius: 8px;">
-                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-radius: 8px;" title="Update Quantity">
-                          ↺
-                        </button>
-                      </form>
-                    </td>
-
-                    <td class="fw-bold">${{ "%.2f"|format(item.menu_item.price) }}</td>
-                    <td class="fw-bold text-primary">${{ "%.2f"|format(item.menu_item.price * item.quantity) }}</td>
-
-                    <!-- Remove Button with Modal -->
-                    <td class="text-right">
-                      <button class="btn btn-sm btn-outline-danger border-0" data-toggle="modal"
-                              data-target="#confirmRemoveModal{{ item.id }}" style="border-radius: 8px;" title="Remove Item">
-                        ✕ Remove
-                      </button>
-
-                      <!-- Modal -->
-                      <div class="modal fade" id="confirmRemoveModal{{ item.id }}" tabindex="-1"
-                           aria-labelledby="confirmRemoveModalLabel{{ item.id }}" aria-hidden="true" style="text-align: left;">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-                            <div class="modal-header border-bottom-0">
-                              <h5 class="modal-title fw-bold" id="confirmRemoveModalLabel{{ item.id }}">
-                                Remove Item
-                              </h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body pb-0">
-                              Are you sure you want to remove <strong>{{ item.menu_item.name }}</strong> from your cart?
-                            </div>
-                            <div class="modal-footer border-top-0 pt-4">
-                              <button type="button" class="btn btn-outline-secondary px-4" style="border-radius: 50px;" data-dismiss="modal">Cancel</button>
-                              <form action="{{ url_for('update_cart', cart_id=item.id) }}" method="POST" class="m-0">
-                                <input type="hidden" name="remove" value="1">
-                                <button type="submit" class="btn btn-danger px-4" style="border-radius: 50px;">Yes, Remove</button>
-                              </form>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="text-center py-5">
-            <h4 class="text-muted mb-4">Your cart is currently empty.</h4>
-            <a href="{{ url_for('menu') }}" class="btn btn-primary px-4 py-2" style="border-radius: 50px;">Browse Menu</a>
-          </div>
-        {% endif %}
-      </div>
+        </div>
     </div>
 
-    <!-- Order Summary Section -->
+    <!-- ORDER SUMMARY & CHECKOUT COLUMN -->
     {% if cart_items %}
     <div class="col-lg-4">
-      <div class="cart-card border-0 sticky-top" style="top: 100px;">
-        <h4 class="fw-bold mb-4">Order Summary</h4>
-        
-        <div class="d-flex justify-content-between mb-3">
-          <span class="text-muted">Subtotal</span>
-          <span class="fw-bold">${{ "%.2f"|format(total) }}</span>
+        <div class="card border-0 shadow-sm rounded-lg p-4 bg-white sticky-top" style="top: 90px;">
+            <h4 class="font-weight-bold mb-4">Order Summary</h4>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Subtotal</span>
+                <span class="font-weight-bold text-dark">${{ "%.2f"|format(subtotal) }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Delivery Fee</span>
+                {% if delivery_fee == 0 %}
+                <span class="badge badge-success px-2 py-1 font-weight-bold">FREE</span>
+                {% else %}
+                <span class="font-weight-bold text-dark">${{ "%.2f"|format(delivery_fee) }}</span>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+                <span class="text-muted">Taxes & Charges (5%)</span>
+                <span class="font-weight-bold text-dark">${{ "%.2f"|format(tax) }}</span>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="h5 font-weight-bold mb-0">Total Amount</span>
+                <span class="h4 font-weight-bold text-danger mb-0">${{ "%.2f"|format(total) }}</span>
+            </div>
+
+            <!-- CHECKOUT FORM -->
+            <form action="{{ url_for('checkout') }}" method="POST">
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold small text-muted"><i class="fas fa-location-dot text-danger mr-1"></i> Delivery Address</label>
+                    <input type="text" name="delivery_address" class="form-control" value="Flat 402, Jubilee Hills, Hyderabad" required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold small text-muted"><i class="fas fa-phone text-danger mr-1"></i> Contact Phone</label>
+                    <input type="text" name="phone" class="form-control" value="+91 98765 43210" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block py-3 font-weight-bold rounded-pill shadow-sm" style="font-size: 1.1rem;">
+                    <i class="fas fa-lock mr-2"></i> Place Order (${{ "%.2f"|format(total) }})
+                </button>
+            </form>
+
+            <div class="text-center mt-3 small text-muted">
+                <i class="fas fa-shield-halved text-success mr-1"></i> Safe & Secure Checkout
+            </div>
         </div>
-        <div class="d-flex justify-content-between mb-3">
-          <span class="text-muted">Delivery Fee</span>
-          <span class="text-success fw-bold">Free</span>
-        </div>
-        <div class="d-flex justify-content-between mb-3">
-          <span class="text-muted">Taxes & Charges</span>
-          <span class="fw-bold">$0.00</span>
-        </div>
-        
-        <hr class="my-4">
-        
-        <div class="d-flex justify-content-between mb-4">
-          <span class="h5 fw-bold mb-0">Total</span>
-          <span class="h5 fw-bold mb-0 text-primary">${{ "%.2f"|format(total) }}</span>
-        </div>
-        
-        <form action="{{ url_for('checkout') }}" method="POST" class="w-100 m-0">
-          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" style="border-radius: 50px; font-size: 1.1rem;">
-            Proceed to Checkout
-          </button>
-        </form>
-        <div class="text-center mt-3">
-            <a href="{{ url_for('menu') }}" class="text-decoration-none text-muted" style="font-size: 0.9rem;">
-                ← Continue Shopping
-            </a>
-        </div>
-      </div>
     </div>
     {% endif %}
-
-  </div>
 </div>
-{% endblock content %}
+
+{% endblock %}

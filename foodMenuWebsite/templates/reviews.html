@@ -1,72 +1,99 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- HERO SECTION -->
-<section class="hero-main d-flex align-items-center justify-content-center text-center mb-5" style="height: 40vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
+<!-- HERO BANNER -->
+<section class="hero-main mb-5" style="min-height: 280px; padding: 40px 20px;">
     <div class="hero-content">
-        <h1 class="display-4 fw-bold text-white">Customer Reviews</h1>
-        <p class="lead text-white opacity-75">See what our food lovers are saying about Foodmato.</p>
+        <span class="badge badge-pill badge-light px-3 py-1 text-primary font-weight-bold mb-2">
+            ⭐ 100% Verified Customer Reviews
+        </span>
+        <h1 class="display-4 font-weight-bold">What Food Lovers Say</h1>
+        <p class="lead mb-0">Genuine feedback, honest ratings, and culinary stories from verified orders.</p>
     </div>
 </section>
 
-<div class="container mb-5">
-    <div class="row">
-        <!-- Review Card 1 -->
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card form-card h-100 border-0 p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Rahul Sharma" class="rounded-circle mr-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--primary-color);">
-                    <div>
-                        <h5 class="mb-0 fw-bold">Rahul Sharma</h5>
-                        <div class="text-warning mt-1" style="font-size: 1.1rem;">⭐⭐⭐⭐⭐</div>
-                    </div>
-                </div>
-                <p class="card-text text-muted font-italic">"Amazing food and very fast delivery. The biryani was incredible! Highly recommend the new menu items."</p>
+<!-- RATING STATS BANNER -->
+<div class="card border-0 shadow-sm rounded-lg p-4 mb-5 bg-white">
+    <div class="row text-center align-items-center">
+        <div class="col-md-4 mb-3 mb-md-0 border-right">
+            <h2 class="display-4 font-weight-bold text-success mb-0">{{ avg_rating }}</h2>
+            <div class="text-warning my-1" style="font-size: 1.25rem;">
+                ⭐⭐⭐⭐⭐
             </div>
+            <p class="text-muted small mb-0">Average Restaurant Platform Rating</p>
         </div>
-        
-        <!-- Review Card 2 -->
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card form-card h-100 border-0 p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Priya Patel" class="rounded-circle mr-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--primary-color);">
-                    <div>
-                        <h5 class="mb-0 fw-bold">Priya Patel</h5>
-                        <div class="text-warning mt-1" style="font-size: 1.1rem;">⭐⭐⭐⭐</div>
-                    </div>
-                </div>
-                <p class="card-text text-muted font-italic">"Great variety of dishes. Loved the pasta and desserts. Foodmato is my new go-to app for dinner."</p>
-            </div>
+        <div class="col-md-4 mb-3 mb-md-0 border-right">
+            <h2 class="display-4 font-weight-bold text-dark mb-0">{{ reviews|length }}</h2>
+            <div class="text-muted my-1 font-weight-bold">Verified Reviews</div>
+            <p class="text-muted small mb-0">Reviews submitted only after completed orders</p>
         </div>
-
-        <!-- Review Card 3 -->
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card form-card h-100 border-0 p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="David Brown" class="rounded-circle mr-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--primary-color);">
-                    <div>
-                        <h5 class="mb-0 fw-bold">David Brown</h5>
-                        <div class="text-warning mt-1" style="font-size: 1.1rem;">⭐⭐⭐⭐⭐</div>
-                    </div>
-                </div>
-                <p class="card-text text-muted font-italic">"Beautiful UI and delicious food options. The ordering process is so smooth and flawless."</p>
-            </div>
-        </div>
-
-        <!-- Review Card 4 -->
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card form-card h-100 border-0 p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop" alt="Aisha Khan" class="rounded-circle mr-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--primary-color);">
-                    <div>
-                        <h5 class="mb-0 fw-bold">Aisha Khan</h5>
-                        <div class="text-warning mt-1" style="font-size: 1.1rem;">⭐⭐⭐⭐</div>
-                    </div>
-                </div>
-                <p class="card-text text-muted font-italic">"Authentic flavors and great presentation. The global cuisines feature really sets this app apart from others."</p>
+        <div class="col-md-4">
+            <div class="p-2">
+                <i class="fas fa-shield-halved fa-2x text-primary mb-2"></i>
+                <h6 class="font-weight-bold mb-1">Authenticity Guaranteed</h6>
+                <p class="text-muted small mb-0">No fake reviews. Every submission is tied to a real delivered meal.</p>
             </div>
         </div>
     </div>
 </div>
+
+<!-- REVIEWS GRID -->
+{% if reviews %}
+<div class="row">
+    {% for rev in reviews %}
+    <div class="col-md-6 col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm rounded-lg h-100 p-4 bg-white">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="d-flex align-items-center">
+                    <img src="{{ url_for('static', filename='profile_pics/' + (rev.user.image_file or 'default.webp')) }}"
+                         alt="{{ rev.user.first_name }}"
+                         class="rounded-circle mr-3 border"
+                         style="width: 52px; height: 52px; object-fit: cover;">
+                    <div>
+                        <h5 class="mb-0 font-weight-bold">{{ rev.user.first_name }} {{ rev.user.last_name or '' }}</h5>
+                        <small class="text-muted">
+                            <i class="fas fa-check-circle text-success mr-1"></i> Verified Order #{{ rev.order_id }}
+                        </small>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="badge badge-warning text-dark font-weight-bold px-2 py-1">
+                        ⭐ {{ "%.1f"|format(rev.rating) }}
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-secondary font-italic flex-grow-1" style="font-size: 1rem; line-height: 1.6;">
+                "{{ rev.comment }}"
+            </p>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-2">
+                {% if rev.restaurant %}
+                <a href="{{ url_for('restaurant_detail', restaurant_id=rev.restaurant.id) }}" class="small font-weight-bold text-danger">
+                    <i class="fas fa-store mr-1"></i> {{ rev.restaurant.name }}
+                </a>
+                {% else %}
+                <span class="small text-muted">Foodmato Kitchen</span>
+                {% endif %}
+                <small class="text-muted">
+                    {% if rev.created_at %}
+                        {{ rev.created_at.strftime('%B %d, %Y') }}
+                    {% else %}
+                        Recently
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 bg-white rounded-lg shadow-sm">
+    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+    <h4 class="font-weight-bold">No customer reviews yet</h4>
+    <p class="text-muted">Complete an order to share your thoughts and help others find the best food!</p>
+    <a href="{{ url_for('menu') }}" class="btn btn-primary rounded-pill px-4">Browse Menu</a>
+</div>
+{% endif %}
 
 {% endblock %}

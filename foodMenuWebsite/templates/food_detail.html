@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('menu') }}">Menu</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('menu', category=item.category) }}">{{ item.category|capitalize }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-lg overflow-hidden mb-5">
+    <div class="row no-gutters">
+        <!-- FOOD IMAGE -->
+        <div class="col-lg-6">
+            <img src="{{ item.image_url or url_for('static', filename='profile_pics/special_biryani.jpg') }}" alt="{{ item.name }}" class="w-100 h-100" style="min-height: 400px; object-fit: cover;">
+        </div>
+
+        <!-- FOOD DETAILS & CART CONTROLS -->
+        <div class="col-lg-6 p-4 p-md-5 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    {% if item.is_veg %}
+                        <span class="badge-veg-dot"></span>
+                        <span class="badge badge-success px-2 py-1 mr-2 font-weight-bold">100% Pure Veg</span>
+                    {% else %}
+                        <span class="badge-nonveg-dot"></span>
+                        <span class="badge badge-danger px-2 py-1 mr-2 font-weight-bold">Non-Vegetarian</span>
+                    {% endif %}
+
+                    {% if item.is_spicy %}
+                        <span class="badge badge-warning text-dark font-weight-bold px-2 py-1 mr-2">
+                            <i class="fas fa-pepper-hot text-danger mr-1"></i> Spicy
+                        </span>
+                    {% endif %}
+
+                    <span class="badge badge-light text-muted border px-2 py-1 font-weight-bold">
+                        {{ item.category|capitalize }}
+                    </span>
+                </div>
+
+                <h1 class="font-weight-bold mb-2">{{ item.name }}</h1>
+
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge badge-success px-2 py-1 mr-2 font-weight-bold">
+                        <i class="fas fa-star mr-1"></i> {{ item.rating }}
+                    </span>
+                    <span class="text-muted small">Customer Rating</span>
+                </div>
+
+                <div class="h2 font-weight-bold text-danger mb-3">
+                    ${{ "%.2f"|format(item.price) }}
+                    <small class="text-muted font-weight-normal" style="font-size: 1rem;">(approx ₹{{ (item.price * 83)|int }})</small>
+                </div>
+
+                <p class="text-muted mb-4 lead" style="font-size: 1.05rem;">
+                    {{ item.description if item.description else "Handcrafted with fresh garden vegetables, authentic traditional spices, and culinary passion." }}
+                </p>
+
+                <!-- RESTAURANT INFO -->
+                {% if item.restaurant %}
+                <div class="p-3 bg-light rounded-lg mb-4 border d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted d-block text-uppercase font-weight-bold">Prepared By</small>
+                        <h6 class="font-weight-bold mb-0 text-dark">{{ item.restaurant.name }}</h6>
+                        <small class="text-muted"><i class="fas fa-map-marker-alt text-danger mr-1"></i> {{ item.restaurant.address }}</small>
+                    </div>
+                    <a href="{{ url_for('restaurant_detail', restaurant_id=item.restaurant.id) }}" class="btn btn-sm btn-outline-danger">
+                        Restaurant &rarr;
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ADD TO CART FORM -->
+            <div class="pt-3 border-top">
+                {% if current_user.is_authenticated %}
+                <form action="{{ url_for('add_to_cart', menu_item_id=item.id) }}" method="POST">
+                    <div class="row align-items-center">
+                        <div class="col-sm-4 mb-2 mb-sm-0">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="decrementQty()">-</button>
+                                </div>
+                                <input type="number" id="dishQty" name="quantity" class="form-control text-center font-weight-bold" value="1" min="1" max="20">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="incrementQty()">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <button type="submit" class="btn btn-primary btn-block py-2 font-weight-bold rounded-pill">
+                                <i class="fas fa-shopping-bag mr-2"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-block py-2 font-weight-bold rounded-pill">
+                        Log in to Order This Dish
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RELATED DISHES IN SAME CATEGORY -->
+{% if related_items %}
+<div class="mt-5">
+    <h3 class="font-weight-bold mb-4">You Might Also Like</h3>
+    <div class="row">
+        {% for rel in related_items %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card menu-card h-100">
+                <a href="{{ url_for('food_detail', item_id=rel.id) }}">
+                    <img src="{{ rel.image_url or url_for('static', filename='profile_pics/special_biryani.jpg') }}" alt="{{ rel.name }}" style="height: 160px; object-fit: cover;" loading="lazy">
+                </a>
+                <div class="card-body p-3 d-flex flex-column">
+                    <h6 class="font-weight-bold mb-1">
+                        <a href="{{ url_for('food_detail', item_id=rel.id) }}" class="text-dark">{{ rel.name }}</a>
+                    </h6>
+                    <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                        <span class="font-weight-bold text-danger">${{ "%.2f"|format(rel.price) }}</span>
+                        <a href="{{ url_for('food_detail', item_id=rel.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function incrementQty() {
+        const input = document.getElementById('dishQty');
+        let val = parseInt(input.value) || 1;
+        if (val < 20) input.value = val + 1;
+    }
+    function decrementQty() {
+        const input = document.getElementById('dishQty');
+        let val = parseInt(input.value) || 1;
+        if (val > 1) input.value = val - 1;
+    }
+</script>
+{% endblock %}

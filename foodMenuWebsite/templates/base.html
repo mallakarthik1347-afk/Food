@@ -3,92 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title|default("Foodmato") }}</title>
+    <title>{{ title|default("Foodmato — AI-Powered Food Delivery") }}</title>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Custom Professional Styling -->
+    <!-- Bootstrap 4.6 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Leaflet CSS for GPS Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Custom Styling -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
-    <!-- Modern Navbar -->
-    <nav class="navbar navbar-expand-md navbar-modern">
+    <!-- Modern Responsive Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-modern">
         <div class="container">
             <!-- Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="/">
-                <span style="font-size: 1.8rem; margin-right: 8px; line-height: 1;">🍅</span> Foodmato
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <span class="mr-2" style="font-size: 1.8rem; line-height: 1;">🍅</span> Foodmato
             </a>
 
-            <!-- Mobile Toggle -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <!-- Mobile Hamburger Toggle -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none;">
+                <i class="fas fa-bars text-dark" style="font-size: 1.4rem;"></i>
             </button>
 
-            <!-- Nav Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Left Side -->
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/reviews">Reviews</a></li>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav mr-auto pl-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}"><i class="fas fa-home mr-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('restaurants') }}"><i class="fas fa-store mr-1"></i> Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('menu') }}"><i class="fas fa-utensils mr-1"></i> Food Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('reviews') }}"><i class="fas fa-star mr-1"></i> Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('all_posts') }}"><i class="fas fa-newspaper mr-1"></i> Stories</a>
+                    </li>
                 </ul>
 
-                <!-- Right Side Buttons -->
-                <div class="navbar-nav ml-auto align-items-center">
-
-                    <!-- Hamburger dropdown button -->
-                    <div class="nav-item dropdown">
-                        <button class="hamburger-btn dropdown-toggle" id="moreMenu" type="button"
-                                role="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false" aria-label="More">
-                            &#9776; <!-- ☰ Hamburger icon -->
-                        </button>
-
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="moreMenu" id="moreMenuList">
-                            <!-- Always visible -->
-                            <a class="dropdown-item" href="/menu">Menu</a>
-                            <a class="dropdown-item" href="/About/Story">About</a>
-                            <a class="dropdown-item" href="/Contact">Contact</a>
-
-                            {% if current_user.is_authenticated %}
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/posts">Posts</a>
-                            <a class="dropdown-item" href="/reviews">Reviews</a>
-                              {% if current_user.is_owner %}
-                                <a class="dropdown-item" href="/owner/orders">Orders Recieved</a>
-                              {% else %}
-                                <a class="dropdown-item" href="/cart">Cart</a>
-                                <a class="dropdown-item" href="/orders">My Orders</a>
-                              {% endif %}
-
-                            {% endif %}
-                        </div>
-                    </div>
-
+                <!-- Right Nav -->
+                <ul class="navbar-nav ml-auto align-items-lg-center">
                     {% if current_user.is_authenticated %}
-                        <a class="nav-item nav-link" href="{{ url_for('account')}}">Account</a>
-                        <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
+                        {% if current_user.is_owner %}
+                            <li class="nav-item mr-2">
+                                <a class="btn btn-sm btn-dark px-3 py-2 text-white" href="{{ url_for('admin_dashboard') }}">
+                                    <i class="fas fa-chart-line mr-1"></i> Admin Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item mr-2">
+                                <a class="nav-link font-weight-bold" href="{{ url_for('owner_orders') }}">
+                                    <i class="fas fa-clipboard-list mr-1"></i> Orders Received
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item mr-2">
+                                <a class="nav-link font-weight-bold position-relative" href="{{ url_for('view_cart') }}">
+                                    <i class="fas fa-shopping-bag mr-1 text-primary"></i> Cart
+                                </a>
+                            </li>
+                            <li class="nav-item mr-2">
+                                <a class="nav-link font-weight-bold" href="{{ url_for('orders') }}">
+                                    <i class="fas fa-clock-rotate-left mr-1"></i> My Orders
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src="{{ url_for('static', filename='profile_pics/' + (current_user.image_file or 'default.webp')) }}"
+                                     class="rounded-circle mr-2 border" style="width: 32px; height: 32px; object-fit: cover;">
+                                <span>{{ current_user.first_name }}</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow-lg border-0" aria-labelledby="userMenu">
+                                <a class="dropdown-item py-2" href="{{ url_for('account') }}"><i class="fas fa-user-circle mr-2 text-muted"></i> Profile Settings</a>
+                                <a class="dropdown-item py-2" href="{{ url_for('orders') }}"><i class="fas fa-box mr-2 text-muted"></i> Order History</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item py-2 text-danger" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt mr-2"></i> Log Out</a>
+                            </div>
+                        </li>
                     {% else %}
-                        <a href="/login" class="btn btn-outline-primary mr-2">Log In</a>
-                        <a href="/register" class="btn btn-primary">Sign Up</a>
+                        <li class="nav-item mr-2">
+                            <a class="btn btn-outline-primary px-4 py-2 font-weight-bold" href="{{ url_for('login') }}">Log In</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary px-4 py-2 font-weight-bold" href="{{ url_for('register') }}">Sign Up</a>
+                        </li>
                     {% endif %}
-                </div>
+                </ul>
             </div>
         </div>
     </nav>
 
     <!-- Page Content Wrapper -->
     <div class="container content-wrapper mt-4">
-
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message|safe }}
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -100,68 +131,210 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- AI Food Assistant Chatbot Floating Widget -->
+    <button id="chatbot-toggle-btn" class="chatbot-float-btn" onclick="toggleChatWindow()" title="Ask Foodmato AI Assistant">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <div id="chatbot-window" class="chatbot-window" style="display: none;">
+        <div class="chatbot-header">
+            <div class="d-flex align-items-center">
+                <div class="bg-white text-danger rounded-circle p-2 mr-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 font-weight-bold">Foodmato AI Assistant</h6>
+                    <small style="opacity: 0.9;">Grounded with Live Food Database</small>
+                </div>
+            </div>
+            <button onclick="toggleChatWindow()" class="btn btn-link text-white p-0" style="font-size: 1.4rem; text-decoration: none;">&times;</button>
+        </div>
+
+        <div id="chatbot-messages" class="chatbot-body">
+            <div class="chat-bubble bot">
+                👋 Hello! I'm your <strong>Foodmato AI Assistant</strong>. Ask me anything like:
+                <div class="mt-2 pl-2" style="font-size: 0.85rem; border-left: 2px solid var(--primary-color);">
+                    • <em>"Find restaurants near me"</em><br>
+                    • <em>"Suggest spicy dishes under $10"</em><br>
+                    • <em>"What is the best rated restaurant?"</em><br>
+                    • <em>"What is my latest order status?"</em>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick prompt chips -->
+        <div class="px-3 py-2 bg-light border-top d-flex gap-1" style="overflow-x: auto; white-space: nowrap;">
+            <button class="btn btn-xs btn-outline-secondary py-1 px-2 mr-1" style="font-size: 0.75rem; border-radius: 20px;" onclick="quickChat('Find restaurants near me')">📍 Near Me</button>
+            <button class="btn btn-xs btn-outline-secondary py-1 px-2 mr-1" style="font-size: 0.75rem; border-radius: 20px;" onclick="quickChat('Suggest food under $10')">💰 Budget &lt; $10</button>
+            <button class="btn btn-xs btn-outline-secondary py-1 px-2 mr-1" style="font-size: 0.75rem; border-radius: 20px;" onclick="quickChat('Recommend spicy vegetarian food')">🌶️ Spicy Veg</button>
+            <button class="btn btn-xs btn-outline-secondary py-1 px-2" style="font-size: 0.75rem; border-radius: 20px;" onclick="quickChat('What is my latest order status?')">📦 Order Status</button>
+        </div>
+
+        <div class="chatbot-footer">
+            <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Ask about food, prices, restaurants..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="chatbot-send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-brand d-flex align-items-center">
-                        <span style="font-size: 1.8rem; margin-right: 8px; line-height: 1;">🍅</span> Foodmato
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="navbar-brand text-white mb-2">
+                        <span class="mr-2" style="font-size: 1.8rem;">🍅</span> Foodmato
                     </div>
-                    <p class="footer-desc">Delivering the finest flavors straight to your doorstep. Fresh ingredients, authentic taste, fast delivery.</p>
+                    <p class="text-muted pr-lg-4">
+                        Smart AI-powered food delivery platform connecting food lovers with premier local restaurants, live order tracking, and intelligent culinary recommendations.
+                    </p>
+                    <div class="d-flex text-white mt-3">
+                        <a href="#" class="mr-3 text-muted"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="mr-3 text-muted"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="mr-3 text-muted"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-github fa-lg"></i></a>
+                    </div>
                 </div>
-                <div class="footer-links">
+
+                <div class="col-6 col-lg-2 mb-4">
+                    <h5>Discover</h5>
+                    <a href="{{ url_for('restaurants') }}">Nearby Restaurants</a>
+                    <a href="{{ url_for('menu') }}">Food Menu</a>
+                    <a href="{{ url_for('menu', veg='1') }}">Pure Veg Dishes</a>
+                    <a href="{{ url_for('reviews') }}">Verified Reviews</a>
+                </div>
+
+                <div class="col-6 col-lg-2 mb-4">
                     <h5>Company</h5>
-                    <a href="/About/Story">About Us</a>
-                    <a href="/Contact">Contact</a>
-                    <a href="/menu">Our Menu</a>
+                    <a href="{{ url_for('about') }}">Our Story</a>
+                    <a href="{{ url_for('contact') }}">Contact Us</a>
+                    <a href="{{ url_for('all_posts') }}">Food Stories</a>
+                    <a href="#">Careers</a>
                 </div>
-                <div class="footer-links">
-                    <h5>Legal</h5>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Refund Policy</a>
+
+                <div class="col-lg-4 mb-4">
+                    <h5>Location & Hours</h5>
+                    <p class="text-muted mb-1"><i class="fas fa-location-dot text-danger mr-2"></i> HITEC City & Jubilee Hills, Hyderabad, India</p>
+                    <p class="text-muted mb-1"><i class="fas fa-phone text-danger mr-2"></i> +91 40 4010 1986</p>
+                    <p class="text-muted"><i class="fas fa-clock text-danger mr-2"></i> Deliveries active 24/7</p>
                 </div>
             </div>
-            <div class="footer-bottom">
-                &copy; 2026 Foodmato. All rights reserved. Crafted with ❤️ for food lovers.
+
+            <hr style="border-color: #1E293B;">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-muted" style="font-size: 0.9rem;">
+                <div>&copy; 2026 Foodmato Technologies Inc. All rights reserved.</div>
+                <div class="mt-2 mt-md-0">
+                    <span class="badge badge-success px-2 py-1 mr-2"><i class="fas fa-check-circle mr-1"></i> Gemini 2.0 Flash Active</span>
+                    <span class="badge badge-info px-2 py-1"><i class="fas fa-map-pin mr-1"></i> GPS Live Tracking</span>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- JS Scripts -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- Bootstrap & jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
 
-    <!-- Fallback JS (in case Bootstrap dropdown isn't initialized) -->
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chatbot Client Logic -->
     <script>
-        (function() {
-            var btn = document.getElementById('moreMenu');
-            var menu = document.getElementById('moreMenuList');
-            if (!btn || !menu) return;
+        let userLocation = null;
 
-            // If Bootstrap fails to bind dropdown, use fallback
-            btn.addEventListener('click', function(e) {
-                var usingBootstrap = typeof $ !== 'undefined' && typeof $.fn !== 'undefined' && typeof $.fn.dropdown === 'function';
-                if (!usingBootstrap) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    menu.classList.toggle('show');
-                    btn.setAttribute('aria-expanded', menu.classList.contains('show') ? 'true' : 'false');
+        // Try getting user location for GPS-aware chatbot responses (no hardcoded location fallback)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                userLocation = {
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude
+                };
+            }, function(err) {
+                // If high accuracy failed or timed out, try standard accuracy
+                if (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE) {
+                    navigator.geolocation.getCurrentPosition(function(pos2) {
+                        userLocation = { lat: pos2.coords.latitude, lng: pos2.coords.longitude };
+                    }, function() {
+                        userLocation = null; // Do not assume or fake user location
+                    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+                } else {
+                    userLocation = null;
                 }
-            });
+            }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 });
+        }
 
-            // Click outside to close (fallback only)
-            document.addEventListener('click', function(e) {
-                var isClickInside = btn.contains(e.target) || menu.contains(e.target);
-                if (!isClickInside && menu.classList.contains('show')) {
-                    menu.classList.remove('show');
-                    btn.setAttribute('aria-expanded', 'false');
-                }
+        function toggleChatWindow() {
+            const win = document.getElementById('chatbot-window');
+            if (win.style.display === 'none' || win.style.display === '') {
+                win.style.display = 'flex';
+                document.getElementById('chatbot-input').focus();
+            } else {
+                win.style.display = 'none';
+            }
+        }
+
+        function quickChat(text) {
+            document.getElementById('chatbot-input').value = text;
+            sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatbot-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chatMessages = document.getElementById('chatbot-messages');
+
+            // Append user bubble
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user';
+            userBubble.textContent = msg;
+            chatMessages.appendChild(userBubble);
+
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Typing indicator
+            const typingBubble = document.createElement('div');
+            typingBubble.className = 'chat-bubble bot typing-indicator';
+            typingBubble.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Foodmato AI is thinking...';
+            chatMessages.appendChild(typingBubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const payload = {
+                message: msg,
+                latitude: userLocation ? userLocation.lat : null,
+                longitude: userLocation ? userLocation.lng : null
+            };
+
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                typingBubble.remove();
+                const botBubble = document.createElement('div');
+                botBubble.className = 'chat-bubble bot';
+                botBubble.innerHTML = data.response;
+                chatMessages.appendChild(botBubble);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            })
+            .catch(err => {
+                typingBubble.remove();
+                const errBubble = document.createElement('div');
+                errBubble.className = 'chat-bubble bot text-danger';
+                errBubble.innerHTML = "Sorry, I had trouble connecting. Please try again!";
+                chatMessages.appendChild(errBubble);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             });
-        })();
+        }
     </script>
+
+    {% block extra_js %}{% endblock %}
 
 </body>
 </html>

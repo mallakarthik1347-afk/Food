@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- RESTAURANT HERO BANNER -->
+<div class="card border-0 rounded-lg shadow-sm overflow-hidden mb-4">
+    <div class="position-relative" style="height: 320px;">
+        <img src="{{ restaurant.image_url }}" alt="{{ restaurant.name }}" class="w-100 h-100" style="object-fit: cover;">
+        <div class="position-absolute" style="top:0; left:0; right:0; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%);"></div>
+
+        <div class="position-absolute" style="bottom: 25px; left: 30px; right: 30px;">
+            <div class="d-flex flex-wrap justify-content-between align-items-end">
+                <div class="text-white">
+                    <span class="badge badge-danger px-3 py-1 font-weight-bold mb-2">
+                        {{ restaurant.cuisine_type }}
+                    </span>
+                    {% if restaurant.is_veg %}
+                    <span class="badge badge-success px-3 py-1 font-weight-bold mb-2 ml-1">
+                        <i class="fas fa-leaf mr-1"></i> Pure Veg
+                    </span>
+                    {% endif %}
+                    <h1 class="display-5 font-weight-bold text-white mb-1">{{ restaurant.name }}</h1>
+                    <p class="text-white-50 mb-0"><i class="fas fa-map-marker-alt text-danger mr-2"></i> {{ restaurant.address }}</p>
+                </div>
+
+                <div class="mt-3 mt-md-0 text-md-right text-white">
+                    <div class="d-inline-flex align-items-center bg-white text-dark px-3 py-2 rounded-lg shadow font-weight-bold mb-2">
+                        <span class="text-success mr-2 font-weight-bold" style="font-size: 1.25rem;">⭐ {{ restaurant.rating }}</span>
+                        <span class="text-muted small">({{ restaurant.total_reviews }} reviews)</span>
+                    </div>
+                    <div>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ restaurant.latitude }},{{ restaurant.longitude }}" target="_blank" class="btn btn-sm btn-light px-3 font-weight-bold shadow-sm">
+                            <i class="fas fa-diamond-turn-right text-danger mr-1"></i> Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- LEFT: MENU ITEMS -->
+    <div class="col-lg-8 mb-4">
+        <!-- Restaurant Details & Description -->
+        <div class="card border-0 shadow-sm p-4 rounded-lg mb-4">
+            <h4 class="font-weight-bold mb-2">About {{ restaurant.name }}</h4>
+            <p class="text-muted mb-3">{{ restaurant.description }}</p>
+            <div class="row text-muted small">
+                <div class="col-sm-6 mb-2">
+                    <i class="fas fa-clock text-danger mr-2"></i> <strong>Hours:</strong> {{ restaurant.opening_hours }}
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <i class="fas fa-phone text-danger mr-2"></i> <strong>Phone:</strong> {{ restaurant.phone }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Section Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="font-weight-bold mb-0">Restaurant Menu ({{ menu_items|length }} Dishes)</h3>
+        </div>
+
+        <!-- Menu Items List -->
+        {% if menu_items %}
+        <div class="row">
+            {% for item in menu_items %}
+            <div class="col-md-6 mb-3">
+                <div class="card menu-card h-100">
+                    <div class="position-relative">
+                        <a href="{{ url_for('food_detail', item_id=item.id) }}">
+                            <img src="{{ item.image_url or url_for('static', filename='profile_pics/special_biryani.jpg') }}" alt="{{ item.name }}" style="height: 180px; object-fit: cover;" loading="lazy">
+                        </a>
+                        <div class="position-absolute" style="top: 8px; right: 8px;">
+                            <span class="badge badge-light px-2 py-1 shadow-sm font-weight-bold">
+                                ⭐ {{ item.rating }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <div class="d-flex align-items-center mb-1">
+                            {% if item.is_veg %}
+                                <span class="badge-veg-dot"></span> <small class="text-success font-weight-bold">Veg</small>
+                            {% else %}
+                                <span class="badge-nonveg-dot"></span> <small class="text-danger font-weight-bold">Non-Veg</small>
+                            {% endif %}
+                            {% if item.is_spicy %}
+                                <span class="badge badge-warning text-dark ml-2 small"><i class="fas fa-pepper-hot text-danger"></i> Spicy</span>
+                            {% endif %}
+                        </div>
+
+                        <h6 class="font-weight-bold mb-1">
+                            <a href="{{ url_for('food_detail', item_id=item.id) }}" class="text-dark">{{ item.name }}</a>
+                        </h6>
+                        <p class="text-muted small mb-3 flex-grow-1">{{ item.description }}</p>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                            <span class="menu-price text-danger">${{ "%.2f"|format(item.price) }}</span>
+
+                            {% if current_user.is_authenticated %}
+                            <form action="{{ url_for('add_to_cart', menu_item_id=item.id) }}" method="POST" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">
+                                    <i class="fas fa-plus mr-1"></i> Add
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-primary rounded-pill px-2">Order</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">No menu items listed yet for this restaurant.</div>
+        {% endif %}
+
+        <!-- VERIFIED CUSTOMER REVIEWS -->
+        <div class="card border-0 shadow-sm p-4 rounded-lg mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="font-weight-bold mb-0">Customer Reviews</h3>
+                    <small class="text-muted">Verified orders and feedback from authentic customers</small>
+                </div>
+                <div class="text-right">
+                    <span class="h3 font-weight-bold text-success mb-0">⭐ {{ restaurant.rating }}</span>
+                    <small class="d-block text-muted">Out of 5.0 ({{ restaurant.total_reviews }} reviews)</small>
+                </div>
+            </div>
+
+            <!-- REVIEW SUBMISSION FORM (Restricted to verified completed orders) -->
+            {% if current_user.is_authenticated %}
+                {% if eligible_order %}
+                <div class="p-3 mb-4 rounded-lg bg-light border">
+                    <h5 class="font-weight-bold text-primary mb-2">
+                        <i class="fas fa-pen-to-square mr-1"></i> Leave a Review for Order #{{ eligible_order.id }}
+                    </h5>
+                    <p class="text-muted small mb-3">You completed an order from {{ restaurant.name }}. Share your genuine dining experience!</p>
+
+                    <form action="{{ url_for('submit_review', restaurant_id=restaurant.id) }}" method="POST">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="order_id" value="{{ eligible_order.id }}">
+
+                        <div class="form-group mb-3">
+                            {{ form.rating.label(class="font-weight-bold small text-muted") }}
+                            {{ form.rating(class="form-control") }}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.comment.label(class="font-weight-bold small text-muted") }}
+                            {{ form.comment(class="form-control", rows="3", placeholder="Tell others about food quality, taste, freshness, and delivery speed...") }}
+                        </div>
+
+                        {{ form.submit(class="btn btn-primary btn-sm px-4") }}
+                    </form>
+                </div>
+                {% else %}
+                <div class="p-3 mb-4 rounded-lg bg-light text-muted small border">
+                    <i class="fas fa-shield-halved text-success mr-1"></i>
+                    <strong>Verified Reviews Policy:</strong> Reviews are unlocked once you place and receive an order from {{ restaurant.name }}.
+                </div>
+                {% endif %}
+            {% else %}
+            <div class="p-3 mb-4 rounded-lg bg-light text-muted small border text-center">
+                Please <a href="{{ url_for('login') }}" class="font-weight-bold text-primary">log in</a> to write a review after placing your order.
+            </div>
+            {% endif %}
+
+            <!-- Reviews List -->
+            {% if reviews %}
+                {% for rev in reviews %}
+                <div class="border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='profile_pics/' + (rev.user.image_file or 'default.webp')) }}" class="rounded-circle mr-2 border" style="width: 38px; height: 38px; object-fit: cover;">
+                            <div>
+                                <h6 class="font-weight-bold mb-0">{{ rev.user.first_name }} {{ rev.user.last_name or '' }}</h6>
+                                <small class="text-muted"><i class="fas fa-circle-check text-success mr-1"></i> Verified Buyer (Order #{{ rev.order_id }})</small>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge badge-warning text-dark font-weight-bold px-2 py-1">
+                                ⭐ {{ "%.1f"|format(rev.rating) }}
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-secondary mt-2 mb-1" style="font-size: 0.95rem;">{{ rev.comment }}</p>
+                    <small class="text-muted">
+                        {% if rev.created_at %}
+                            {{ rev.created_at.strftime('%B %d, %Y') }}
+                        {% else %}
+                            Recently
+                        {% endif %}
+                    </small>
+                </div>
+                {% endfor %}
+            {% else %}
+            <p class="text-muted text-center py-3">No reviews yet for this restaurant. Be the first to order and review!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RIGHT: RESTAURANT LOCATION MAP & DETAILS -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-lg p-3 sticky-top" style="top: 90px;">
+            <h5 class="font-weight-bold mb-3"><i class="fas fa-map-location-dot text-danger mr-2"></i> Restaurant Location</h5>
+            <div id="restaurant-map" style="height: 280px;" class="mb-3"></div>
+
+            <h6 class="font-weight-bold mb-1">{{ restaurant.name }}</h6>
+            <p class="text-muted small mb-2">{{ restaurant.address }}</p>
+
+            <a href="https://www.google.com/maps/dir/?api=1&destination={{ restaurant.latitude }},{{ restaurant.longitude }}"
+               target="_blank" class="btn btn-outline-primary btn-block mb-3 font-weight-bold">
+                <i class="fas fa-diamond-turn-right mr-1"></i> Get Directions on Google Maps
+            </a>
+
+            <div class="p-3 bg-light rounded-lg">
+                <h6 class="font-weight-bold small text-muted text-uppercase mb-2">Delivery Information</h6>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Estimated Prep Time:</span>
+                    <span class="font-weight-bold text-dark">20–30 mins</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Delivery Fee:</span>
+                    <span class="font-weight-bold text-success">Free over $20</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Live Tracking:</span>
+                    <span class="font-weight-bold text-primary">Available</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const restLat = {{ restaurant.latitude }};
+        const restLng = {{ restaurant.longitude }};
+
+        const map = L.map('restaurant-map').setView([restLat, restLng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const restIcon = L.divIcon({
+            className: 'rest-pin',
+            html: '<div style="background:#E23744; color:#fff; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.3); border:2px solid white;"><i class="fas fa-store"></i></div>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 36]
+        });
+
+        L.marker([restLat, restLng], { icon: restIcon })
+            .addTo(map)
+            .bindPopup("<strong>{{ restaurant.name }}</strong><br>{{ restaurant.address }}")
+            .openPopup();
+    });
+</script>
+{% endblock %}
